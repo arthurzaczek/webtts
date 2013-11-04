@@ -1,6 +1,7 @@
 package net.zaczek.webtts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 import net.zaczek.webtts.Data.DataManager;
@@ -21,12 +22,15 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.TextToSpeech.OnInitListener;
+import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +44,7 @@ public class Article extends Activity implements OnInitListener {
 	private static final int EXIT_ID = 3;
 
 	private TextView txtArticle;
+	private ProgressBar progBar;
 	private WakeLock wl;
 	
 	TextToSpeech tts;
@@ -47,29 +52,61 @@ public class Article extends Activity implements OnInitListener {
 	boolean isPlaying = false;
 
 	private StringBuilder text;
+	private String[] sentences;
+	private int currentSentenceIdx = 0;
+	
 	private ArrayList<ArticleRef> moreArticles;
 	private WebSiteRef webSite;
 	private ArticleRef article;
 
+	private HashMap<String, String> ttsParams = new HashMap<String, String>();
+
 	/** Called when the activity is first created. */
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.article);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
-		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				"ListenToPageAndStayAwake");
+
+		ttsParams.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "next");
+
 		tts = new TextToSpeech(this, this);
+		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
+			@Override
+			public void onUtteranceCompleted(String utteranceId) {
+				final int localIdx = currentSentenceIdx; 
+				progBar.setProgress(localIdx);
+				currentSentenceIdx++;
+				if(sentences != null && localIdx < sentences.length) {
+					tts.speak(sentences[localIdx], TextToSpeech.QUEUE_ADD, ttsParams);
+				}
+			}
+		});
 
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
+		progBar = (ProgressBar)findViewById(R.id.progBar);
+		progBar.setProgress(0);
+		progBar.setMax(0);
 
-		Intent intent = getIntent();
+		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
 		webSite = intent.getParcelableExtra("website");
 		super.setTitle(article.text);
 		fillData();
+	}
+	
+	private void play() {
+		if (sentences != null && sentences.length > 0 && ttsInitialized && !isPlaying) {
+			final int localIdx = currentSentenceIdx; 
+			currentSentenceIdx++;
+			tts.speak(sentences[localIdx], TextToSpeech.QUEUE_FLUSH, ttsParams);
+			isPlaying = true;
+		}
 	}
 	
 	@Override
@@ -118,7 +155,7 @@ public class Article extends Activity implements OnInitListener {
 		private String url;
 
 		public FillDataTask() {
-			this.url = article.url;
+			url = article.url;
 			text = new StringBuilder();
 			moreArticles = new ArrayList<ArticleRef>();
 			txtArticle.setText("Loading " + url);
@@ -172,18 +209,15 @@ public class Article extends Activity implements OnInitListener {
 				Toast.makeText(Article.this, msg, Toast.LENGTH_SHORT).show();
 				txtArticle.setText(msg);
 			} else {
-				txtArticle.setText(String.format("%d chars", text.length()));
+				sentences = text.toString().split("\\.");
+				txtArticle.setText(String.format("%d chars, %d sentences", text.length(), sentences.length));
+				progBar.setProgress(0);
+				progBar.setMax(sentences.length);
+				currentSentenceIdx = 0;
 				play();
 			}
 			task = null;
 			super.onPostExecute(result);
-		}
-	}
-
-	private void play() {
-		if (text != null && ttsInitialized && !isPlaying) {
-			tts.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
-			isPlaying = true;
 		}
 	}
 
