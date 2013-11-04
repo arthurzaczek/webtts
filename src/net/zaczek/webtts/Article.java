@@ -1,6 +1,7 @@
 package net.zaczek.webtts;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.zaczek.webtts.Data.DataManager;
 
@@ -19,6 +20,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,7 +30,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Article extends Activity {
+public class Article extends Activity implements OnInitListener {
 	private static final String TAG = "webtts";
 
 	private static final int DLG_WAIT = 1;
@@ -38,6 +41,10 @@ public class Article extends Activity {
 
 	private TextView txtArticle;
 	private WakeLock wl;
+	
+	TextToSpeech tts;
+	boolean ttsInitialized = false;
+	boolean isPlaying = false;
 
 	private StringBuilder text;
 	private ArrayList<ArticleRef> moreArticles;
@@ -54,15 +61,26 @@ public class Article extends Activity {
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				"ListenToPageAndStayAwake");
+		tts = new TextToSpeech(this, this);
 
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
-
-		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
 		Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
 		webSite = intent.getParcelableExtra("website");
+		super.setTitle(article.text);
 		fillData();
+	}
+	
+	@Override
+	public void onInit(int status) {
+		if (status == TextToSpeech.SUCCESS) {
+			tts.setLanguage(Locale.GERMAN);
+			ttsInitialized = true;
+			play();
+	    } else {
+	        Log.e(TAG, "Initilization Failed");
+	    }
 	}
 
 	@Override
@@ -80,6 +98,10 @@ public class Article extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		if (tts != null) {
+	        tts.stop();
+	        tts.shutdown();
+	    }
 	}
 
 	private void fillData() {
@@ -159,8 +181,9 @@ public class Article extends Activity {
 	}
 
 	private void play() {
-		if (text != null) {
-			// mTTS.speak(text.toString(), TTSManager.QUEUE_FLUSH, null);
+		if (text != null && ttsInitialized && !isPlaying) {
+			tts.speak(text.toString(), TextToSpeech.QUEUE_FLUSH, null);
+			isPlaying = true;
 		}
 	}
 

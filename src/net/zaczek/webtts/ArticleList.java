@@ -46,6 +46,7 @@ public class ArticleList extends AbstractListActivity implements OnItemSelectedL
 		
 		Intent intent = getIntent();
 		webSite = intent.getParcelableExtra("website");
+		setTitle(webSite.text);
 
 		getListView().setOnItemSelectedListener(this);
 		fillData();
