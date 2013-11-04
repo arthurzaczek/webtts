@@ -96,6 +96,7 @@ public class DataManager {
 	    	}
 	    	result.add(url);
 	    }
+		sr.close();
 		return result;
 	}
 
