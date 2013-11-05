@@ -283,6 +283,8 @@ public class Article extends Activity implements OnInitListener {
 		return super.onMenuItemSelected(featureId, item);
 	}
 
+	// http://stackoverflow.com/questions/5584605/is-it-possible-to-react-to-headphone-volume-up-down-keys-in-an-android-applicati
+	// http://developer.android.com/training/managing-audio/volume-playback.html
 	class MPR extends BroadcastReceiver {
 		public MPR() {
 			super();
