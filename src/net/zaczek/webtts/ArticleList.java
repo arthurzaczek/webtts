@@ -89,7 +89,7 @@ public class ArticleList extends AbstractListActivity implements OnItemSelectedL
 	private class FillDataTask extends AsyncTask<Void, Void, Void> {
 		private String msg;
 		private String url;
-		ArrayList<ArticleRef> articles;
+		private ArrayList<ArticleRef> articles;
 
 		public FillDataTask(String url) {
 			this.url = url;
@@ -114,10 +114,12 @@ public class ArticleList extends AbstractListActivity implements OnItemSelectedL
 					Elements links = doc.select(webSite.link_selector);
 					Log.i(TAG, "Parsed " + links.size() + " links");
 					String lnkText;
+					int idx = 0;
 					for (Element lnk : links) {
 						lnkText = lnk.text();
 						if(!TextUtils.isEmpty(lnkText)) {
-							articles.add(new ArticleRef(lnk.attr("abs:href"), lnkText));
+							articles.add(new ArticleRef(lnk.attr("abs:href"), lnkText, idx));
+							idx++;
 						}
 					}
 				} else {
@@ -141,6 +143,7 @@ public class ArticleList extends AbstractListActivity implements OnItemSelectedL
 			}
 
 			task = null;
+			DataManager.setCurrentArticles(articles);
 			adapter = new ArrayAdapter<ArticleRef>(ArticleList.this,
 					android.R.layout.simple_list_item_1, articles);
 			setListAdapter(adapter);

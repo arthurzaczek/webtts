@@ -7,13 +7,15 @@ public class ArticleRef implements Parcelable {
 	public ArticleRef() {
 	}
 	
-	public ArticleRef(String url, String text) {
+	public ArticleRef(String url, String text, int idx) {
 		this.url = url;
 		this.text = text;
-	}
+		this.index = idx;
+	}	
 
 	public String url;
 	public String text;
+	public int index;
 
 	@Override
 	public String toString() {
@@ -29,6 +31,7 @@ public class ArticleRef implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(url);
 		dest.writeString(text);
+		dest.writeInt(index);
 	}
 	
     public static final Parcelable.Creator<ArticleRef> CREATOR = new Parcelable.Creator<ArticleRef>() {
@@ -45,5 +48,6 @@ public class ArticleRef implements Parcelable {
     private ArticleRef(Parcel in) {
         url = in.readString();
         text = in.readString();
+        index = in.readInt();
     }
 }

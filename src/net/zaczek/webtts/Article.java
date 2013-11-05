@@ -14,8 +14,10 @@ import org.jsoup.select.Elements;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
@@ -46,7 +49,7 @@ public class Article extends Activity implements OnInitListener {
 	private TextView txtArticle;
 	private ProgressBar progBar;
 	private WakeLock wl;
-	
+
 	TextToSpeech tts;
 	boolean ttsInitialized = false;
 	boolean isPlaying = false;
@@ -54,12 +57,14 @@ public class Article extends Activity implements OnInitListener {
 	private StringBuilder text;
 	private String[] sentences;
 	private int currentSentenceIdx = 0;
-	
+
 	private ArrayList<ArticleRef> moreArticles;
 	private WebSiteRef webSite;
 	private ArticleRef article;
 
 	private HashMap<String, String> ttsParams = new HashMap<String, String>();
+
+	private MPR mediaPlayerReceiver = new MPR();
 
 	/** Called when the activity is first created. */
 	@SuppressWarnings("deprecation")
@@ -79,45 +84,50 @@ public class Article extends Activity implements OnInitListener {
 		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
 			@Override
 			public void onUtteranceCompleted(String utteranceId) {
-				final int localIdx = currentSentenceIdx; 
+				if(!isPlaying) return;
+				final int localIdx = currentSentenceIdx;
 				progBar.setProgress(localIdx);
 				currentSentenceIdx++;
-				if(sentences != null && localIdx < sentences.length) {
-					tts.speak(sentences[localIdx], TextToSpeech.QUEUE_ADD, ttsParams);
+				if (sentences != null && localIdx < sentences.length) {
+					tts.speak(sentences[localIdx], TextToSpeech.QUEUE_ADD,
+							ttsParams);
 				}
 			}
 		});
 
+		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+		mediaFilter.setPriority(9999);
+		this.registerReceiver(mediaPlayerReceiver, mediaFilter);
+
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
-		progBar = (ProgressBar)findViewById(R.id.progBar);
-		progBar.setProgress(0);
-		progBar.setMax(0);
+		progBar = (ProgressBar) findViewById(R.id.progBar);
+		
 
 		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
 		webSite = intent.getParcelableExtra("website");
-		super.setTitle(article.text);
 		fillData();
 	}
-	
+
 	private void play() {
-		if (sentences != null && sentences.length > 0 && ttsInitialized && !isPlaying) {
-			final int localIdx = currentSentenceIdx; 
+		if (sentences != null && sentences.length > 0 && ttsInitialized
+				&& !isPlaying) {
+			final int localIdx = currentSentenceIdx;
 			currentSentenceIdx++;
 			tts.speak(sentences[localIdx], TextToSpeech.QUEUE_FLUSH, ttsParams);
 			isPlaying = true;
 		}
 	}
-	
+
 	@Override
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
 			tts.setLanguage(Locale.GERMAN);
 			ttsInitialized = true;
 			play();
-	    } else {
-	        Log.e(TAG, "Initilization Failed");
-	    }
+		} else {
+			Log.e(TAG, "Initilization Failed");
+		}
 	}
 
 	@Override
@@ -136,12 +146,16 @@ public class Article extends Activity implements OnInitListener {
 	protected void onDestroy() {
 		super.onDestroy();
 		if (tts != null) {
-	        tts.stop();
-	        tts.shutdown();
-	    }
+			tts.stop();
+			tts.shutdown();
+		}
 	}
 
 	private void fillData() {
+		super.setTitle(article.text);
+		progBar.setProgress(0);
+		progBar.setMax(0);
+
 		if (task == null) {
 			task = new FillDataTask();
 			task.execute();
@@ -186,9 +200,11 @@ public class Article extends Activity implements OnInitListener {
 					// More Articles
 					if (!TextUtils.isEmpty(webSite.readmore_selector)) {
 						Elements links = doc.select(webSite.readmore_selector);
+						int idx =0;
 						for (Element lnk : links) {
 							moreArticles.add(new ArticleRef(lnk
-									.attr("abs:href"), lnk.text()));
+									.attr("abs:href"), lnk.text(), idx));
+							idx++;
 						}
 					}
 				} else {
@@ -210,7 +226,8 @@ public class Article extends Activity implements OnInitListener {
 				txtArticle.setText(msg);
 			} else {
 				sentences = text.toString().split("\\.");
-				txtArticle.setText(String.format("%d chars, %d sentences", text.length(), sentences.length));
+				txtArticle.setText(String.format("%d chars, %d sentences",
+						text.length(), sentences.length));
 				progBar.setProgress(0);
 				progBar.setMax(sentences.length);
 				currentSentenceIdx = 0;
@@ -258,11 +275,64 @@ public class Article extends Activity implements OnInitListener {
 			finish();
 			return true;
 			// Respond to the action bar's Up/Home button
-	    case android.R.id.home:
-	        NavUtils.navigateUpFromSameTask(this);
-	        return true;
+		case android.R.id.home:
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
 		}
 
 		return super.onMenuItemSelected(featureId, item);
+	}
+
+	class MPR extends BroadcastReceiver {
+		public MPR() {
+			super();
+		}
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String intentAction = intent.getAction();
+			if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
+				return;
+			}
+			KeyEvent event = (KeyEvent) intent
+					.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+			if (event == null) {
+				return;
+			}
+			try {
+				int action = event.getAction();
+				switch (action) {
+				case KeyEvent.KEYCODE_MEDIA_PLAY:
+					if(isPlaying) {
+						stop();
+					} else {
+						play();
+					}
+					break;
+				case KeyEvent.KEYCODE_MEDIA_NEXT:
+					if(article.index < DataManager.getCurrentArticles().size()) {
+						stop();
+						article = DataManager.getCurrentArticles().get(article.index + 1);
+						fillData();
+					}
+					break;
+				case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+					if(article.index > 0) {
+						stop();
+						article = DataManager.getCurrentArticles().get(article.index - 1);
+						fillData();
+					}
+					break;
+				}
+			} catch (Exception e) {
+				Log.e(TAG, "Error in BroadcastReceiver", e);
+			}
+			abortBroadcast();
+		}
+
+		private void stop() {
+			isPlaying = false;
+			tts.stop();
+		}
 	}
 }

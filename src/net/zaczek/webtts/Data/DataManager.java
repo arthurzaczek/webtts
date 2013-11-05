@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
 
+import net.zaczek.webtts.ArticleRef;
 import net.zaczek.webtts.WebSiteRef;
 
 import android.os.Environment;
@@ -109,5 +110,14 @@ public class DataManager {
 			sw.flush();
 			sw.close();
 		}
+	}
+	
+	private static ArrayList<ArticleRef> globalArticles;
+	public static ArrayList<ArticleRef> getCurrentArticles() {
+		return globalArticles;
+	}
+	
+	public static void setCurrentArticles(ArrayList<ArticleRef> value) {
+		globalArticles = value;
 	}
 }
