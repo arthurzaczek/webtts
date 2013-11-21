@@ -84,7 +84,8 @@ public class Article extends Activity implements OnInitListener {
 		tts.setOnUtteranceCompletedListener(new OnUtteranceCompletedListener() {
 			@Override
 			public void onUtteranceCompleted(String utteranceId) {
-				if(!isPlaying) return;
+				if (!isPlaying)
+					return;
 				final int localIdx = currentSentenceIdx;
 				progBar.setProgress(localIdx);
 				currentSentenceIdx++;
@@ -101,7 +102,6 @@ public class Article extends Activity implements OnInitListener {
 
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
 		progBar = (ProgressBar) findViewById(R.id.progBar);
-		
 
 		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
@@ -167,8 +167,12 @@ public class Article extends Activity implements OnInitListener {
 	private class FillDataTask extends AsyncTask<Void, Void, Void> {
 		private String msg;
 		private String url;
+		private String[] defaultSelectors;
 
 		public FillDataTask() {
+			defaultSelectors = new String[] { "article", "main",
+					"div[id=article], div.article", "div[id=story], div.story",
+					"div[id=content], div.content", "div[id=main], div.main", };
 			url = article.url;
 			text = new StringBuilder();
 			moreArticles = new ArrayList<ArticleRef>();
@@ -188,7 +192,26 @@ public class Article extends Activity implements OnInitListener {
 				int status = response.statusCode();
 				if (status == 200) {
 					Document doc = response.parse();
-					Elements elements = doc.select(webSite.article_selector);
+					Elements elements = null;
+
+					// if(TextUtils.isEmpty(webSite.article_selector)) { } else
+					// { }
+					for (String selector : defaultSelectors) {
+						Log.d(TAG, "Trying selector " + selector);
+						elements = doc.select(selector);
+						if (elements != null && elements.size() > 0)
+						{
+							Log.d(TAG, "  -> found " + elements.size() + " elements");
+							break;
+						}
+					}
+
+					if (elements == null) {
+						msg = "Article text could not be extracted, no suitable root element found";
+						Log.w(TAG, msg);
+						return null;
+					}
+
 					for (Element e : elements) {
 						text.append(e.text());
 						if (text.charAt(text.length() - 1) != '.') {
@@ -200,7 +223,7 @@ public class Article extends Activity implements OnInitListener {
 					// More Articles
 					if (!TextUtils.isEmpty(webSite.readmore_selector)) {
 						Elements links = doc.select(webSite.readmore_selector);
-						int idx =0;
+						int idx = 0;
 						for (Element lnk : links) {
 							moreArticles.add(new ArticleRef(lnk
 									.attr("abs:href"), lnk.text(), idx));
@@ -305,23 +328,25 @@ public class Article extends Activity implements OnInitListener {
 				int action = event.getAction();
 				switch (action) {
 				case KeyEvent.KEYCODE_MEDIA_PLAY:
-					if(isPlaying) {
+					if (isPlaying) {
 						stop();
 					} else {
 						play();
 					}
 					break;
 				case KeyEvent.KEYCODE_MEDIA_NEXT:
-					if(article.index < DataManager.getCurrentArticles().size()) {
+					if (article.index < DataManager.getCurrentArticles().size()) {
 						stop();
-						article = DataManager.getCurrentArticles().get(article.index + 1);
+						article = DataManager.getCurrentArticles().get(
+								article.index + 1);
 						fillData();
 					}
 					break;
 				case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-					if(article.index > 0) {
+					if (article.index > 0) {
 						stop();
-						article = DataManager.getCurrentArticles().get(article.index - 1);
+						article = DataManager.getCurrentArticles().get(
+								article.index - 1);
 						fillData();
 					}
 					break;
