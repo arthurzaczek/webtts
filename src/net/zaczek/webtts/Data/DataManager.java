@@ -34,7 +34,8 @@ public class DataManager {
 		return new FileReader(file);
 	}
 
-	public static OutputStreamWriter openWrite(String name, boolean append) throws IOException {
+	public static OutputStreamWriter openWrite(String name, boolean append)
+			throws IOException {
 		File root = Environment.getExternalStorageDirectory();
 		File dir = new File(root, "webtts");
 		dir.mkdir();
@@ -42,7 +43,8 @@ public class DataManager {
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(file, append), "UTF-8");
+		OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(
+				file, append), "UTF-8");
 		if (append == false)
 			out.write('\ufeff');
 		return out;
@@ -63,7 +65,8 @@ public class DataManager {
 		c.setConnectTimeout(TIMEOUT);
 		c.setReadTimeout(TIMEOUT);
 
-		final BufferedReader rd = new BufferedReader(new InputStreamReader(c.getInputStream()), BUFFER_SIZE);
+		final BufferedReader rd = new BufferedReader(new InputStreamReader(
+				c.getInputStream()), BUFFER_SIZE);
 		final StringBuffer result = new StringBuffer("");
 		for (String line; (line = rd.readLine()) != null;) {
 			result.append(line).append("\n");
@@ -71,38 +74,44 @@ public class DataManager {
 		rd.close();
 		return result;
 	}
-	
+
 	public static org.jsoup.Connection jsoupConnect(String url) {
-		return Jsoup.connect(url)
-			.timeout(TIMEOUT)
-			.followRedirects(true)
-			.header("Connection", "close")
-			.userAgent("Mozilla/5.0 (Linux; U; Android 1.5; AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
+		return Jsoup
+				.connect(url)
+				.timeout(TIMEOUT)
+				.followRedirects(true)
+				.header("Connection", "close")
+				.userAgent(
+						"Mozilla/5.0 (Linux; U; Android 1.5; AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1");
 	}
 
 	public static ArrayList<WebSiteRef> readWebSites() throws IOException {
 		final ArrayList<WebSiteRef> result = new ArrayList<WebSiteRef>();
 		final FileReader sr = openRead("websites.csv");
-		final CSVReader reader = new CSVReader(sr);
-	    String [] line;
-	    reader.readNext(); // skip first line
-	    while ((line = reader.readNext()) != null) {
-	    	final WebSiteRef url = new WebSiteRef();
-	    	url.text = line[0];
-	    	url.url = line[1];
-	    	url.link_selector = line[2];
-	    	url.article_selector = line[3];
-	    	if(line.length > 4) {
-	    		url.readmore_selector = line[4];
-	    	}
-	    	result.add(url);
-	    }
-		sr.close();
+		try {
+			final CSVReader reader = new CSVReader(sr);
+			String[] line;
+			reader.readNext(); // skip first line
+			while ((line = reader.readNext()) != null) {
+				final WebSiteRef url = new WebSiteRef();
+				url.text = line[0];
+				url.url = line[1];
+				url.link_selector = line[2];
+				url.article_selector = line[3];
+				if (line.length > 4) {
+					url.readmore_selector = line[4];
+				}
+				result.add(url);
+			}
+		} finally {
+			sr.close();
+		}
 		return result;
 	}
 
 	public static void downloadWebSites() throws IOException {
-		final StringBuffer urls = downloadText(new URL("https://docs.google.com/spreadsheet/pub?key=0Au6e93kxiTMhdGdUVmZvdEdZcHdvaVBZUlp0WFpYU2c&single=true&gid=0&output=csv"));
+		final StringBuffer urls = downloadText(new URL(
+				"https://docs.google.com/spreadsheet/pub?key=0Au6e93kxiTMhdGdUVmZvdEdZcHdvaVBZUlp0WFpYU2c&single=true&gid=0&output=csv"));
 		final OutputStreamWriter sw = openWrite("websites.csv", false);
 		try {
 			sw.write(urls.toString());
@@ -111,12 +120,13 @@ public class DataManager {
 			sw.close();
 		}
 	}
-	
+
 	private static ArrayList<ArticleRef> globalArticles;
+
 	public static ArrayList<ArticleRef> getCurrentArticles() {
 		return globalArticles;
 	}
-	
+
 	public static void setCurrentArticles(ArrayList<ArticleRef> value) {
 		globalArticles = value;
 	}
