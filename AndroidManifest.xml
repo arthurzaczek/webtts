@@ -7,12 +7,12 @@
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="19" />
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -23,23 +23,40 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		<activity android:name="net.zaczek.webtts.ArticleList" android:label="Article List">
-		    <!-- Parent activity meta-data to support 4.0 and lower -->
-        	<meta-data
-            	android:name="android.support.PARENT_ACTIVITY"
-            	android:value="net.zaczek.webtts.MainActivity" />
-		</activity>
-		<activity android:name="net.zaczek.webtts.Article" android:label="Article">
-		    <!-- Parent activity meta-data to support 4.0 and lower -->
-        	<meta-data
-            	android:name="android.support.PARENT_ACTIVITY"
-            	android:value="net.zaczek.webtts.ArticleList" />
-		</activity>
-		<activity android:name="net.zaczek.webtts.About" android:label="About">
-		</activity>
+        <activity
+            android:name="net.zaczek.webtts.ArticleList"
+            android:label="Article List" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.zaczek.webtts.MainActivity" />
+        </activity>
+        <activity
+            android:name="net.zaczek.webtts.Article"
+            android:label="Article" >
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.zaczek.webtts.ArticleList" />
+        </activity>
+        <activity
+            android:name="net.zaczek.webtts.About"
+            android:label="About" >
+        </activity>
+        <activity
+            android:name="net.zaczek.webtts.EditWebSiteActivity"
+            android:label="@string/title_activity_edit_web_site"
+            android:parentActivityName="net.zaczek.webtts.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.zaczek.webtts.MainActivity" />
+        </activity>
     </application>
-   
+
 </manifest>

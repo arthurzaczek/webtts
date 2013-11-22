@@ -20,12 +20,12 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 public class MainActivity extends AbstractListActivity implements
-OnItemSelectedListener {
-private static final String TAG = "PTalkingBrowser";
+		OnItemSelectedListener {
+	private static final String TAG = "WebTTS";
 
-private static final int DLG_WAIT = 1;
+	private static final int DLG_WAIT = 1;
 
-private ArrayAdapter<WebSiteRef> adapter;
+	private ArrayAdapter<WebSiteRef> adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,8 @@ private ArrayAdapter<WebSiteRef> adapter;
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
 			long id) {
 		try {
-			// mTTS.speak(adapter.getItem(pos).text, TTSManager.QUEUE_FLUSH, null);
+			// mTTS.speak(adapter.getItem(pos).text, TTSManager.QUEUE_FLUSH,
+			// null);
 		} catch (Exception ex) {
 			Log.e(TAG, ex.toString());
 		}
@@ -81,12 +82,15 @@ private ArrayAdapter<WebSiteRef> adapter;
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		int itemId = item.getItemId();
 		switch (itemId) {
-		case R.id.action_sync:
-			sync();
-			break;
+		case R.id.action_add_website:
+			startActivity(new Intent(this, EditWebSiteActivity.class));
+			return true;
 		case R.id.action_about:
 			startActivity(new Intent(this, About.class));
 			return true;
+		case R.id.action_sync:
+			sync();
+			break;
 		case R.id.action_exit:
 			finish();
 			return true;
@@ -107,7 +111,7 @@ private ArrayAdapter<WebSiteRef> adapter;
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
-				DataManager.downloadWebSites();
+				DataManager.downloadWebSitesSettings();
 			} catch (Exception ex) {
 				msg = ex.toString();
 			}
@@ -118,7 +122,8 @@ private ArrayAdapter<WebSiteRef> adapter;
 		protected void onPostExecute(Void result) {
 			dismissDialog(DLG_WAIT);
 			if (!TextUtils.isEmpty(msg)) {
-				Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT)
+						.show();
 			}
 			fillData();
 			syncTask = null;

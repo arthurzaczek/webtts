@@ -7,5 +7,13 @@
     <string name="sync">Sync</string>
     <string name="about">About</string>
     <string name="exit">Exit</string>
+    <string name="title_activity_edit_web_site">Edit web site</string>
+    <string name="name">Name</string>
+    <string name="url">Url</string>
+    <string name="article_selector">Article selector</string>
+    <string name="link_selector">Link selector</string>
+    <string name="add_website">Add website</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
 
 </resources>
