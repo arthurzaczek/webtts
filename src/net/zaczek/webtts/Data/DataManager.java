@@ -17,6 +17,7 @@ import net.zaczek.webtts.ArticleRef;
 import net.zaczek.webtts.WebSiteRef;
 
 import android.os.Environment;
+import android.text.TextUtils;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class DataManager {
@@ -86,8 +87,18 @@ public class DataManager {
 	}
 
 	public static ArrayList<WebSiteRef> readWebSites() throws IOException {
+		return readWebSitesInternal("websites.csv");
+	}
+
+	public static ArrayList<WebSiteRef> readWebSitesSettings()
+			throws IOException {
+		return readWebSitesInternal("websites_settings.csv");
+	}
+
+	private static ArrayList<WebSiteRef> readWebSitesInternal(String file)
+			throws IOException {
 		final ArrayList<WebSiteRef> result = new ArrayList<WebSiteRef>();
-		final FileReader sr = openRead("websites.csv");
+		final FileReader sr = openRead(file);
 		try {
 			final CSVReader reader = new CSVReader(sr);
 			String[] line;
@@ -109,10 +120,31 @@ public class DataManager {
 		return result;
 	}
 
-	public static void downloadWebSites() throws IOException {
+	public static void writeWebSites(ArrayList<WebSiteRef> sites)
+			throws IOException {
+		final OutputStreamWriter sw = openWrite("websites.csv", false);
+		try {
+			sw.write("name,url,link_selector,article_selector,readmore_selector\n");
+			for (WebSiteRef url : sites) {
+				sw.write("\"" + url.text + "\"");
+				sw.write(",\"" + url.url + "\"");
+				sw.write(",\"" + url.link_selector + "\"");
+				sw.write(",\"" + url.article_selector + "\"");
+				if (!TextUtils.isEmpty(url.readmore_selector)) {
+					sw.write(",\"" + url.readmore_selector + "\"");
+				}
+				sw.write("\n");
+			}
+		} finally {
+			sw.flush();
+			sw.close();
+		}
+	}
+
+	public static void downloadWebSitesSettings() throws IOException {
 		final StringBuffer urls = downloadText(new URL(
 				"https://docs.google.com/spreadsheet/pub?key=0Au6e93kxiTMhdGdUVmZvdEdZcHdvaVBZUlp0WFpYU2c&single=true&gid=0&output=csv"));
-		final OutputStreamWriter sw = openWrite("websites.csv", false);
+		final OutputStreamWriter sw = openWrite("websites_settings.csv", false);
 		try {
 			sw.write(urls.toString());
 		} finally {
