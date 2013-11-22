@@ -10,9 +10,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -31,6 +33,7 @@ public class MainActivity extends AbstractListActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		registerForContextMenu(getListView());
 		fillData();
 	}
 
@@ -70,6 +73,27 @@ public class MainActivity extends AbstractListActivity implements
 			Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
 		}
 	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		getMenuInflater().inflate(R.menu.main_list_item, menu);
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		int itemId = item.getItemId();
+		switch (itemId) {
+		case R.id.action_edit:
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+			Intent i = new Intent(this, EditWebSiteActivity.class);
+			WebSiteRef website = adapter.getItem(info.position);
+			i.putExtra("website", website);
+			startActivity(i);
+			return true;
+		}
+		return super.onContextItemSelected(item);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,7 +114,7 @@ public class MainActivity extends AbstractListActivity implements
 			return true;
 		case R.id.action_sync:
 			sync();
-			break;
+			return true;
 		case R.id.action_exit:
 			finish();
 			return true;

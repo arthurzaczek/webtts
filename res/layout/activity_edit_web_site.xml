@@ -100,7 +100,8 @@
         android:layout_alignBaseline="@+id/btnCancel"
         android:layout_alignBottom="@+id/btnCancel"
         android:layout_alignRight="@+id/scrollViewEdit"
-        android:text="@string/save" />
+        android:text="@string/save"
+        android:onClick="onSave" />
 
     <Button
         android:id="@+id/btnCancel"
@@ -108,7 +109,8 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/scrollViewEdit"
         android:layout_alignParentBottom="true"
-        android:text="@android:string/cancel" />
+        android:text="@android:string/cancel"
+        android:onClick="onCancel" />
 
     <Button
         android:id="@+id/btnDelete"
@@ -117,6 +119,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/btnSave"
-        android:text="@string/delete" />
+        android:text="@string/delete"
+        android:onClick="onDelete" />
 
 </RelativeLayout>
