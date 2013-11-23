@@ -12,7 +12,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -33,12 +32,10 @@ public class ArticleListActivity extends AbstractListActivity implements
 		OnItemSelectedListener {
 	private static final String TAG = "webtts";
 
-	private static final int DLG_WAIT = 1;
-
 	private static final int ABOUT_ID = 1;
 	private static final int EXIT_ID = 2;
-	private ArrayAdapter<ArticleRef> adapter;
 
+	private ArrayAdapter<ArticleRef> adapter;
 	private WebSiteRef webSite;
 
 	/** Called when the activity is first created. */
@@ -47,7 +44,7 @@ public class ArticleListActivity extends AbstractListActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.articlelist);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
+		
 		Intent intent = getIntent();
 		webSite = intent.getParcelableExtra("website");
 		setTitle(webSite.text);
@@ -97,14 +94,17 @@ public class ArticleListActivity extends AbstractListActivity implements
 		private ArrayList<ArticleRef> articles;
 		private HashMap<Integer, ArrayList<ArticleRef>> articlesMap;
 		private boolean useMap = true;
+		private ProgressDialog dialog;
 
 		public FillDataTask(String url) {
+			dialog = new ProgressDialog(ArticleListActivity.this);
+			dialog.setMessage("Loading");
 			this.url = url;
 		}
 
 		@Override
 		protected void onPreExecute() {
-			showDialog(DLG_WAIT);
+			dialog.show();
 			super.onPreExecute();
 		}
 
@@ -167,7 +167,7 @@ public class ArticleListActivity extends AbstractListActivity implements
 
 		@Override
 		protected void onPostExecute(Void result) {
-			dismissDialog(DLG_WAIT);
+			dialog.dismiss();
 
 			if (!TextUtils.isEmpty(msg)) {
 				Toast.makeText(ArticleListActivity.this, msg, Toast.LENGTH_SHORT)
@@ -193,20 +193,6 @@ public class ArticleListActivity extends AbstractListActivity implements
 
 			super.onPostExecute(result);
 		}
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		ProgressDialog dialog;
-		switch (id) {
-		case DLG_WAIT:
-			dialog = new ProgressDialog(this);
-			dialog.setMessage("Loading");
-			break;
-		default:
-			dialog = null;
-		}
-		return dialog;
 	}
 
 	@Override

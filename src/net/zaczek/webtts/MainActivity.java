@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
 import net.zaczek.webtts.Data.WebSiteRefAdapter;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,8 +25,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 public class MainActivity extends AbstractListActivity implements
 		OnItemSelectedListener {
 	private static final String TAG = "WebTTS";
-
-	private static final int DLG_WAIT = 1;
 
 	private ArrayAdapter<WebSiteRef> adapter;
 
@@ -127,10 +124,17 @@ public class MainActivity extends AbstractListActivity implements
 
 	private class SyncTask extends AsyncTask<Void, Void, Void> {
 		private String msg;
+		ProgressDialog dialog;
+		
+		public SyncTask()
+		{
+			dialog = new ProgressDialog(MainActivity.this);
+			dialog.setMessage("Syncing WebSites");
+		}
 
 		@Override
 		protected void onPreExecute() {
-			showDialog(DLG_WAIT);
+			dialog.show();
 			super.onPreExecute();
 		}
 
@@ -146,7 +150,7 @@ public class MainActivity extends AbstractListActivity implements
 
 		@Override
 		protected void onPostExecute(Void result) {
-			dismissDialog(DLG_WAIT);
+			dialog.dismiss();
 			if (!TextUtils.isEmpty(msg)) {
 				Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT)
 						.show();
@@ -165,16 +169,5 @@ public class MainActivity extends AbstractListActivity implements
 			syncTask = new SyncTask();
 			syncTask.execute();
 		}
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-		case DLG_WAIT:
-			ProgressDialog pDialog = new ProgressDialog(this);
-			pDialog.setMessage("Syncing WebSites");
-			return pDialog;
-		}
-		return null;
 	}
 }

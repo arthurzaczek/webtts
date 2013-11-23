@@ -14,19 +14,16 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.NavUtils;
@@ -41,8 +38,6 @@ import android.widget.Toast;
 
 public class ArticleActivity extends Activity implements OnInitListener {
 	private static final String TAG = "webtts";
-
-	private static final int DLG_WAIT = 1;
 
 	private static final int ABOUT_ID = 1;
 	private static final int SHOW_TEXT_ID = 2;
@@ -75,7 +70,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.article);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-
+		
 		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				"ListenToPageAndStayAwake");
@@ -170,8 +165,13 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		private String msg;
 		private String url;
 		private String[] defaultSelectors;
+		private ProgressDialog dialog;
 
 		public FillDataTask() {
+
+			dialog = new ProgressDialog(ArticleActivity.this);
+			dialog.setMessage("Loading");
+
 			defaultSelectors = new String[] { "article", "main",
 					"div[id=article], div.article", "div[id=story], div.story",
 					"div[id=content], div.content", "div[id=main], div.main", };
@@ -183,7 +183,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 
 		@Override
 		protected void onPreExecute() {
-			showDialog(DLG_WAIT);
+			dialog.show();
 			super.onPreExecute();
 		}
 
@@ -249,7 +249,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 
 		@Override
 		protected void onPostExecute(Void result) {
-			dismissDialog(DLG_WAIT);
+			dialog.dismiss();
 
 			if (!TextUtils.isEmpty(msg)) {
 				Toast.makeText(ArticleActivity.this, msg, Toast.LENGTH_SHORT)
@@ -267,20 +267,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			task = null;
 			super.onPostExecute(result);
 		}
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		ProgressDialog dialog;
-		switch (id) {
-		case DLG_WAIT:
-			dialog = new ProgressDialog(this);
-			dialog.setMessage("Loading");
-			break;
-		default:
-			dialog = null;
-		}
-		return dialog;
 	}
 
 	@Override

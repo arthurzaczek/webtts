@@ -124,7 +124,6 @@ public class EditWebSiteActivity extends Activity {
 
 		AlertDialog alert = builder.create();
 		alert.show();
-
 	}
 
 	public void onCancel(View view) {
