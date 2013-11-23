@@ -98,10 +98,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			}
 		});
 
-		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-		mediaFilter.setPriority(9999);
-		this.registerReceiver(mediaPlayerReceiver, mediaFilter);
-
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
 		progBar = (ProgressBar) findViewById(R.id.progBar);
 
@@ -135,12 +131,16 @@ public class ArticleActivity extends Activity implements OnInitListener {
 	@Override
 	protected void onResume() {
 		wl.acquire();
+		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+		mediaFilter.setPriority(9999);
+		this.registerReceiver(mediaPlayerReceiver, mediaFilter);
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
 		wl.release();
+		this.unregisterReceiver(mediaPlayerReceiver);
 		super.onPause();
 	}
 
