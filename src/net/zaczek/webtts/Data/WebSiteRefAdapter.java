@@ -1,6 +1,10 @@
-package net.zaczek.webtts;
+package net.zaczek.webtts.Data;
 
 import java.util.ArrayList;
+
+import net.zaczek.webtts.R;
+import net.zaczek.webtts.R.id;
+import net.zaczek.webtts.R.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -5,7 +5,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
+import net.zaczek.webtts.Data.WebSiteRef;
+
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -32,7 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-public class ArticleList extends AbstractListActivity implements
+public class ArticleListActivity extends AbstractListActivity implements
 		OnItemSelectedListener {
 	private static final String TAG = "webtts";
 
@@ -77,7 +80,7 @@ public class ArticleList extends AbstractListActivity implements
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent i = new Intent(this, Article.class);
+		Intent i = new Intent(this, ArticleActivity.class);
 		ArticleRef a = adapter.getItem(position);
 		i.putExtra("article", a);
 		i.putExtra("website", webSite);
@@ -174,7 +177,7 @@ public class ArticleList extends AbstractListActivity implements
 			dismissDialog(DLG_WAIT);
 
 			if (!TextUtils.isEmpty(msg)) {
-				Toast.makeText(ArticleList.this, msg, Toast.LENGTH_SHORT)
+				Toast.makeText(ArticleListActivity.this, msg, Toast.LENGTH_SHORT)
 						.show();
 			}
 
@@ -191,7 +194,7 @@ public class ArticleList extends AbstractListActivity implements
 				// articles = articlesMap.Values.OrderBy(lst => lst.Count()).Last();
 			}
 			DataManager.setCurrentArticles(articles);
-			adapter = new ArrayAdapter<ArticleRef>(ArticleList.this,
+			adapter = new ArrayAdapter<ArticleRef>(ArticleListActivity.this,
 					android.R.layout.simple_list_item_1, articles);
 			setListAdapter(adapter);
 
@@ -226,7 +229,7 @@ public class ArticleList extends AbstractListActivity implements
 		int itemId = item.getItemId();
 		switch (itemId) {
 		case ABOUT_ID:
-			startActivity(new Intent(this, About.class));
+			startActivity(new Intent(this, AboutActivity.class));
 			return true;
 		case EXIT_ID:
 			finish();

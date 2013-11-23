@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
+import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
+import net.zaczek.webtts.Data.WebSiteRef;
 
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
@@ -37,7 +39,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Article extends Activity implements OnInitListener {
+public class ArticleActivity extends Activity implements OnInitListener {
 	private static final String TAG = "webtts";
 
 	private static final int DLG_WAIT = 1;
@@ -245,7 +247,7 @@ public class Article extends Activity implements OnInitListener {
 			dismissDialog(DLG_WAIT);
 
 			if (!TextUtils.isEmpty(msg)) {
-				Toast.makeText(Article.this, msg, Toast.LENGTH_SHORT).show();
+				Toast.makeText(ArticleActivity.this, msg, Toast.LENGTH_SHORT).show();
 				txtArticle.setText(msg);
 			} else {
 				sentences = text.toString().split("\\.");
@@ -289,7 +291,7 @@ public class Article extends Activity implements OnInitListener {
 		int itemId = item.getItemId();
 		switch (itemId) {
 		case ABOUT_ID:
-			startActivity(new Intent(this, About.class));
+			startActivity(new Intent(this, AboutActivity.class));
 			return true;
 		case SHOW_TEXT_ID:
 			txtArticle.setText(text);

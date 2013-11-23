@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="net.zaczek.webtts.ArticleList"
+            android:name="net.zaczek.webtts.ArticleListActivity"
             android:label="Article List" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -37,7 +37,7 @@
                 android:value="net.zaczek.webtts.MainActivity" />
         </activity>
         <activity
-            android:name="net.zaczek.webtts.Article"
+            android:name="net.zaczek.webtts.ArticleActivity"
             android:label="Article" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -46,7 +46,7 @@
                 android:value="net.zaczek.webtts.ArticleList" />
         </activity>
         <activity
-            android:name="net.zaczek.webtts.About"
+            android:name="net.zaczek.webtts.AboutActivity"
             android:label="About" >
         </activity>
         <activity

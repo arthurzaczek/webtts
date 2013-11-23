@@ -15,8 +15,6 @@ import java.util.Locale;
 
 import org.jsoup.Jsoup;
 
-import net.zaczek.webtts.ArticleRef;
-import net.zaczek.webtts.WebSiteRef;
 
 import android.net.Uri;
 import android.os.Environment;

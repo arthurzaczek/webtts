@@ -3,6 +3,8 @@ package net.zaczek.webtts;
 import java.util.ArrayList;
 
 import net.zaczek.webtts.Data.DataManager;
+import net.zaczek.webtts.Data.WebSiteRef;
+import net.zaczek.webtts.Data.WebSiteRefAdapter;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -55,7 +57,7 @@ public class MainActivity extends AbstractListActivity implements
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent i = new Intent(this, ArticleList.class);
+		Intent i = new Intent(this, ArticleListActivity.class);
 		WebSiteRef website = adapter.getItem(position);
 		i.putExtra("website", website);
 		startActivity(i);
@@ -110,7 +112,7 @@ public class MainActivity extends AbstractListActivity implements
 			startActivity(new Intent(this, EditWebSiteActivity.class));
 			return true;
 		case R.id.action_about:
-			startActivity(new Intent(this, About.class));
+			startActivity(new Intent(this, AboutActivity.class));
 			return true;
 		case R.id.action_sync:
 			sync();

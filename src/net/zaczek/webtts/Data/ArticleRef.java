@@ -1,4 +1,4 @@
-package net.zaczek.webtts;
+package net.zaczek.webtts.Data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
