@@ -40,8 +40,7 @@ public class MainActivity extends AbstractListActivity implements
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
 			long id) {
 		try {
-			// mTTS.speak(adapter.getItem(pos).text, TTSManager.QUEUE_FLUSH,
-			// null);
+			speak(adapter.getItem(pos).text);
 		} catch (Exception ex) {
 			Log.e(TAG, ex.toString());
 		}
@@ -68,6 +67,7 @@ public class MainActivity extends AbstractListActivity implements
 			}
 			adapter = new WebSiteRefAdapter(this, data);
 			setListAdapter(adapter);
+			setSelection(0);
 		} catch (Exception ex) {
 			Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
 		}

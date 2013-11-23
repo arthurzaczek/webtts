@@ -47,9 +47,10 @@ public class ArticleActivity extends Activity implements OnInitListener {
 	private ProgressBar progBar;
 	private WakeLock wl;
 
-	TextToSpeech tts;
-	boolean ttsInitialized = false;
-	boolean isPlaying = false;
+	private TextToSpeech tts;
+	private HashMap<String, String> ttsParams = new HashMap<String, String>();
+	private boolean ttsInitialized = false;
+	private boolean isPlaying = false;
 
 	private StringBuilder text;
 	private String[] sentences;
@@ -58,8 +59,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 	private ArrayList<ArticleRef> moreArticles;
 	private WebSiteRef webSite;
 	private ArticleRef article;
-
-	private HashMap<String, String> ttsParams = new HashMap<String, String>();
 
 	private MPR mediaPlayerReceiver = new MPR();
 

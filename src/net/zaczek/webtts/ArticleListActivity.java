@@ -57,8 +57,8 @@ public class ArticleListActivity extends AbstractListActivity implements
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
 			long id) {
 		try {
-			// ArticleRef a = adapter.getItem(pos);
-			// mTTS.speak(a.text, TTSManager.QUEUE_FLUSH, null);
+			ArticleRef a = adapter.getItem(pos);
+			speak(a.text);
 		} catch (Exception ex) {
 			Log.e(TAG, ex.toString());
 		}
@@ -190,6 +190,7 @@ public class ArticleListActivity extends AbstractListActivity implements
 			adapter = new ArrayAdapter<ArticleRef>(ArticleListActivity.this,
 					android.R.layout.simple_list_item_1, articles);
 			setListAdapter(adapter);
+			setSelection(0);
 
 			super.onPostExecute(result);
 		}
