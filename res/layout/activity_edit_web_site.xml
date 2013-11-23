@@ -94,32 +94,32 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/btnSave"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/btnCancel"
-        android:layout_alignBottom="@+id/btnCancel"
-        android:layout_alignRight="@+id/scrollViewEdit"
-        android:text="@string/save"
-        android:onClick="onSave" />
-
-    <Button
-        android:id="@+id/btnCancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/scrollViewEdit"
-        android:layout_alignParentBottom="true"
-        android:text="@android:string/cancel"
-        android:onClick="onCancel" />
-
-    <Button
         android:id="@+id/btnDelete"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/btnSave"
+        android:layout_toRightOf="@+id/btnSave"
         android:text="@string/delete"
         android:onClick="onDelete" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/scrollViewEdit"
+        android:layout_alignParentBottom="true"
+        android:onClick="onSave"
+        android:text="@string/save" />
+
+    <Button
+        android:id="@+id/btnCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnSave"
+        android:layout_alignBottom="@+id/btnSave"
+        android:layout_alignParentRight="true"
+        android:onClick="onCancel"
+        android:text="@android:string/cancel" />
 
 </RelativeLayout>
