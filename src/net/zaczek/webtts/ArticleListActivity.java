@@ -1,10 +1,7 @@
 package net.zaczek.webtts;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-
 import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
@@ -14,7 +11,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import android.R.integer;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -24,14 +20,12 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
@@ -66,7 +60,7 @@ public class ArticleListActivity extends AbstractListActivity implements
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
 			long id) {
 		try {
-			ArticleRef a = adapter.getItem(pos);
+			// ArticleRef a = adapter.getItem(pos);
 			// mTTS.speak(a.text, TTSManager.QUEUE_FLUSH, null);
 		} catch (Exception ex) {
 			Log.e(TAG, ex.toString());
@@ -119,20 +113,19 @@ public class ArticleListActivity extends AbstractListActivity implements
 			try {
 				articles = new ArrayList<ArticleRef>();
 				articlesMap = new HashMap<Integer, ArrayList<ArticleRef>>();
-				useMap = true; // TextUtils.isEmpty(webSite.link_selector);
-
+				String link_selector = DataManager.getLinkSelector(webSite);
+				useMap = TextUtils.isEmpty(link_selector);
+				if (TextUtils.isEmpty(link_selector)) {
+					link_selector = "a";
+				}
+				
 				Log.i(TAG, "Downloading article list from " + url);
-				Response response = DataManager.jsoupConnect(url).execute();
-				int status = response.statusCode();
+				final Response response = DataManager.jsoupConnect(url).execute();
+				final int status = response.statusCode();
 				if (status == 200) {
 					Log.i(TAG, "Start parsing");
-					Document doc = response.parse();
-					Elements links;
-					if (useMap) {
-						links = doc.select("a");
-					} else {
-						links = doc.select(webSite.link_selector);
-					}
+					final Document doc = response.parse();
+					final Elements links = doc.select(link_selector);
 					Log.i(TAG, "Parsed " + links.size() + " links");
 					String lnkText;
 					String href;

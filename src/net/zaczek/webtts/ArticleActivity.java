@@ -190,21 +190,26 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
-				Response response = DataManager.jsoupConnect(url).execute();
-				int status = response.statusCode();
+				final Response response = DataManager.jsoupConnect(url).execute();
+				final int status = response.statusCode();
 				if (status == 200) {
-					Document doc = response.parse();
+					final Document doc = response.parse();
 					Elements elements = null;
 
-					// if(TextUtils.isEmpty(webSite.article_selector)) { } else
-					// { }
-					for (String selector : defaultSelectors) {
-						Log.d(TAG, "Trying selector " + selector);
-						elements = doc.select(selector);
-						if (elements != null && elements.size() > 0)
-						{
-							Log.d(TAG, "  -> found " + elements.size() + " elements");
-							break;
+					final String article_selector = DataManager
+							.getArticleSelector(webSite);
+
+					if (!TextUtils.isEmpty(article_selector)) {
+						elements = doc.select(article_selector);
+					} else {
+						for (String selector : defaultSelectors) {
+							Log.d(TAG, "Trying selector " + selector);
+							elements = doc.select(selector);
+							if (elements != null && elements.size() > 0) {
+								Log.d(TAG, "  -> found " + elements.size()
+										+ " elements");
+								break;
+							}
 						}
 					}
 
@@ -247,7 +252,8 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			dismissDialog(DLG_WAIT);
 
 			if (!TextUtils.isEmpty(msg)) {
-				Toast.makeText(ArticleActivity.this, msg, Toast.LENGTH_SHORT).show();
+				Toast.makeText(ArticleActivity.this, msg, Toast.LENGTH_SHORT)
+						.show();
 				txtArticle.setText(msg);
 			} else {
 				sentences = text.toString().split("\\.");

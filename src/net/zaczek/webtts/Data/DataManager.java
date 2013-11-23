@@ -15,10 +15,10 @@ import java.util.Locale;
 
 import org.jsoup.Jsoup;
 
-
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class DataManager {
@@ -92,12 +92,13 @@ public class DataManager {
 	}
 
 	private static HashMap<String, WebSiteRef> website_configs_cache = null;
-	public static HashMap<String, WebSiteRef> readWebSitesConfigs()
+
+	private static HashMap<String, WebSiteRef> ensureWebSitesConfigs()
 			throws IOException {
 		if (website_configs_cache == null) {
-			ArrayList<WebSiteRef> lst =readWebSitesInternal("websites_configs.csv"); 
+			ArrayList<WebSiteRef> lst = readWebSitesInternal("websites_configs.csv");
 			website_configs_cache = new HashMap<String, WebSiteRef>();
-			for(WebSiteRef item : lst) {
+			for (WebSiteRef item : lst) {
 				website_configs_cache.put(item.uri.getHost(), item);
 			}
 		}
@@ -121,7 +122,7 @@ public class DataManager {
 				if (line.length > 4) {
 					url.readmore_selector = line[4];
 				}
-				
+
 				url.uri = Uri.parse(url.url.toLowerCase(Locale.getDefault()));
 
 				result.add(url);
@@ -156,13 +157,14 @@ public class DataManager {
 	public static void downloadWebSitesSettings() throws IOException {
 		final StringBuffer urls = downloadText(new URL(
 				"https://docs.google.com/spreadsheet/pub?key=0Au6e93kxiTMhdGdUVmZvdEdZcHdvaVBZUlp0WFpYU2c&single=true&gid=0&output=csv"));
-		final OutputStreamWriter sw = openWrite("websites_settings.csv", false);
+		final OutputStreamWriter sw = openWrite("websites_configs.csv", false);
 		try {
 			sw.write(urls.toString());
 		} finally {
 			sw.flush();
 			sw.close();
 		}
+		website_configs_cache = null;
 	}
 
 	private static ArrayList<ArticleRef> globalArticles;
@@ -173,5 +175,37 @@ public class DataManager {
 
 	public static void setCurrentArticles(ArrayList<ArticleRef> value) {
 		globalArticles = value;
+	}
+
+	public static String getLinkSelector(WebSiteRef webSite) {
+		if (!TextUtils.isEmpty(webSite.link_selector)) {
+			return webSite.link_selector;
+		}
+		try {
+			ensureWebSitesConfigs();
+			WebSiteRef cfg = website_configs_cache.get(webSite.uri.getHost());
+			if(cfg != null && !TextUtils.isEmpty(cfg.link_selector)) {
+				return cfg.link_selector;
+			}
+		} catch (IOException e) {
+			Log.e("WebTTS", "Error reading link selector", e);
+		}
+		return null;
+	}
+
+	public static String getArticleSelector(WebSiteRef webSite) {
+		if (!TextUtils.isEmpty(webSite.article_selector)) {
+			return webSite.article_selector;
+		}
+		try {
+			ensureWebSitesConfigs();
+			WebSiteRef cfg = website_configs_cache.get(webSite.uri.getHost());
+			if(cfg != null && !TextUtils.isEmpty(cfg.article_selector)) {
+				return cfg.article_selector;
+			}
+		} catch (IOException e) {
+			Log.e("WebTTS", "Error reading article selector", e);
+		}
+		return null;
 	}
 }
