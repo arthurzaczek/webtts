@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
+import android.widget.ListView;
 
 public class AbstractListActivity extends ListActivity implements OnInitListener {
 	private static final String TAG = "webtts";
@@ -21,6 +22,7 @@ public class AbstractListActivity extends ListActivity implements OnInitListener
 		super.onCreate(savedInstanceState);
 
 		tts = new TextToSpeech(this, this);
+		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 	}
 	
 	@Override
