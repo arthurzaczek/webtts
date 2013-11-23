@@ -10,12 +10,15 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
 
 import org.jsoup.Jsoup;
 
 import net.zaczek.webtts.ArticleRef;
 import net.zaczek.webtts.WebSiteRef;
 
+import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import au.com.bytecode.opencsv.CSVReader;
@@ -90,9 +93,17 @@ public class DataManager {
 		return readWebSitesInternal("websites.csv");
 	}
 
-	public static ArrayList<WebSiteRef> readWebSitesSettings()
+	private static HashMap<String, WebSiteRef> website_configs_cache = null;
+	public static HashMap<String, WebSiteRef> readWebSitesConfigs()
 			throws IOException {
-		return readWebSitesInternal("websites_settings.csv");
+		if (website_configs_cache == null) {
+			ArrayList<WebSiteRef> lst =readWebSitesInternal("websites_configs.csv"); 
+			website_configs_cache = new HashMap<String, WebSiteRef>();
+			for(WebSiteRef item : lst) {
+				website_configs_cache.put(item.uri.getHost(), item);
+			}
+		}
+		return website_configs_cache;
 	}
 
 	private static ArrayList<WebSiteRef> readWebSitesInternal(String file)
@@ -112,6 +123,9 @@ public class DataManager {
 				if (line.length > 4) {
 					url.readmore_selector = line[4];
 				}
+				
+				url.uri = Uri.parse(url.url.toLowerCase(Locale.getDefault()));
+
 				result.add(url);
 			}
 		} finally {

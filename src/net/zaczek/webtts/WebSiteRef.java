@@ -1,5 +1,6 @@
 package net.zaczek.webtts;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -16,6 +17,7 @@ public class WebSiteRef implements Parcelable {
 	public String link_selector;
 	public String article_selector;
 	public String readmore_selector;
+	public Uri uri;
 
 	@Override
 	public String toString() {
@@ -34,6 +36,7 @@ public class WebSiteRef implements Parcelable {
 		dest.writeString(link_selector);
 		dest.writeString(article_selector);
 		dest.writeString(readmore_selector);
+		dest.writeString(uri.toString());
 	}
 	
     public static final Parcelable.Creator<WebSiteRef> CREATOR = new Parcelable.Creator<WebSiteRef>() {
@@ -53,5 +56,6 @@ public class WebSiteRef implements Parcelable {
         link_selector = in.readString();
         article_selector = in.readString();
         readmore_selector = in.readString();
+        uri = Uri.parse(in.readString());
     }
 }
