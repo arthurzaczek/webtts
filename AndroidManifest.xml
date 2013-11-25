@@ -44,7 +44,7 @@
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.zaczek.webtts.ArticleList" />
+                android:value="net.zaczek.webtts.ArticleListActivity" />
         </activity>
         <activity
             android:name="net.zaczek.webtts.AboutActivity"
