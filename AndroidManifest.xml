@@ -29,7 +29,8 @@
         </activity>
         <activity
             android:name="net.zaczek.webtts.ArticleListActivity"
-            android:label="Article List" >
+            android:label="Article List"
+            android:launchMode="singleTop" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
