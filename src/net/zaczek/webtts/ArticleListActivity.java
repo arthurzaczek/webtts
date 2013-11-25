@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.annotation.SuppressLint;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -22,14 +23,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
 
-public class ArticleListActivity extends AbstractListActivity implements
-		OnItemSelectedListener {
+public class ArticleListActivity extends ListActivity {
 	private static final String TAG = "webtts";
 
 	private static final int ABOUT_ID = 1;
@@ -44,35 +42,29 @@ public class ArticleListActivity extends AbstractListActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.articlelist);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		Intent intent = getIntent();
 		webSite = intent.getParcelableExtra("website");
-		setTitle(webSite.text);
-
-		getListView().setOnItemSelectedListener(this);
+		if(webSite != null) {
+			setTitle(webSite.text);
+		}
 		fillData();
 	}
 
-	@Override
-	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
-			long id) {
-		try {
-			ArticleRef a = adapter.getItem(pos);
-			speak(a.text);
-		} catch (Exception ex) {
-			Log.e(TAG, ex.toString());
+	public void onPlayAll(View v) {
+		if (adapter.getCount() > 0) {
+			play(0);
 		}
 	}
 
 	@Override
-	public void onNothingSelected(AdapterView<?> arg0) {
-
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		play(position);
 	}
 
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		Intent i = new Intent(this, ArticleActivity.class);
-		ArticleRef a = adapter.getItem(position);
+	private void play(int position) {
+		final ArticleRef a = adapter.getItem(position);
+		final Intent i = new Intent(this, ArticleActivity.class);
 		i.putExtra("article", a);
 		i.putExtra("website", webSite);
 		startActivity(i);
@@ -118,9 +110,10 @@ public class ArticleListActivity extends AbstractListActivity implements
 				if (TextUtils.isEmpty(link_selector)) {
 					link_selector = "a";
 				}
-				
+
 				Log.i(TAG, "Downloading article list from " + url);
-				final Response response = DataManager.jsoupConnect(url).execute();
+				final Response response = DataManager.jsoupConnect(url)
+						.execute();
 				final int status = response.statusCode();
 				if (status == 200) {
 					Log.i(TAG, "Start parsing");
@@ -170,21 +163,23 @@ public class ArticleListActivity extends AbstractListActivity implements
 			dialog.dismiss();
 
 			if (!TextUtils.isEmpty(msg)) {
-				Toast.makeText(ArticleListActivity.this, msg, Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(ArticleListActivity.this, msg,
+						Toast.LENGTH_SHORT).show();
 			}
 
 			task = null;
 			if (useMap && articlesMap.size() > 0) {
-				// articles = articlesMap.Values.OrderBy(lst => lst.Count()).Last();
+				// articles = articlesMap.Values.OrderBy(lst =>
+				// lst.Count()).Last();
 				// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 				articles = articlesMap.values().iterator().next();
-				for(ArrayList<ArticleRef> item : articlesMap.values()) {
-					if(item.size() > articles.size())
+				for (ArrayList<ArticleRef> item : articlesMap.values()) {
+					if (item.size() > articles.size())
 						articles = item;
 				}
 				// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-				// articles = articlesMap.Values.OrderBy(lst => lst.Count()).Last();
+				// articles = articlesMap.Values.OrderBy(lst =>
+				// lst.Count()).Last();
 			}
 			DataManager.setCurrentArticles(articles);
 			adapter = new ArrayAdapter<ArticleRef>(ArticleListActivity.this,

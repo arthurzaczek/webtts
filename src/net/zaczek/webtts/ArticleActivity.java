@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,7 +70,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.article);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
-		
+
 		final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
 				"ListenToPageAndStayAwake");
@@ -108,6 +109,27 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			currentSentenceIdx++;
 			tts.speak(sentences[localIdx], TextToSpeech.QUEUE_FLUSH, ttsParams);
 			isPlaying = true;
+		}
+	}
+
+	private void stop() {
+		isPlaying = false;
+		tts.stop();
+	}
+
+	private void prev() {
+		if (article.index > 0) {
+			stop();
+			article = DataManager.getCurrentArticles().get(article.index - 1);
+			fillData();
+		}
+	}
+
+	private void next() {
+		if (article.index < DataManager.getCurrentArticles().size()) {
+			stop();
+			article = DataManager.getCurrentArticles().get(article.index + 1);
+			fillData();
 		}
 	}
 
@@ -189,7 +211,8 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
-				final Response response = DataManager.jsoupConnect(url).execute();
+				final Response response = DataManager.jsoupConnect(url)
+						.execute();
 				final int status = response.statusCode();
 				if (status == 200) {
 					final Document doc = response.parse();
@@ -299,6 +322,22 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		return super.onMenuItemSelected(featureId, item);
 	}
 
+	public void onPlayPause(View v) {
+		if (isPlaying) {
+			stop();
+		} else {
+			play();
+		}
+	}
+
+	public void onNext(View v) {
+		next();
+	}
+
+	public void onPrev(View v) {
+		prev();
+	}
+
 	// http://stackoverflow.com/questions/5584605/is-it-possible-to-react-to-headphone-volume-up-down-keys-in-an-android-applicati
 	// http://developer.android.com/training/managing-audio/volume-playback.html
 	class MPR extends BroadcastReceiver {
@@ -308,17 +347,21 @@ public class ArticleActivity extends Activity implements OnInitListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			String intentAction = intent.getAction();
+			Log.d(TAG, "MPR called");
+			final String intentAction = intent.getAction();
 			if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
+				Log.d(TAG, "Not ACTION_MEDIA_BUTTON, intent was " + intentAction);
 				return;
 			}
-			KeyEvent event = (KeyEvent) intent
+			final KeyEvent event = (KeyEvent) intent
 					.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 			if (event == null) {
+				Log.d(TAG, "No event");
 				return;
 			}
 			try {
-				int action = event.getAction();
+				final int action = event.getAction();
+				Log.d(TAG, "Event.action = " + action);
 				switch (action) {
 				case KeyEvent.KEYCODE_MEDIA_PLAY:
 					if (isPlaying) {
@@ -328,31 +371,16 @@ public class ArticleActivity extends Activity implements OnInitListener {
 					}
 					break;
 				case KeyEvent.KEYCODE_MEDIA_NEXT:
-					if (article.index < DataManager.getCurrentArticles().size()) {
-						stop();
-						article = DataManager.getCurrentArticles().get(
-								article.index + 1);
-						fillData();
-					}
+					next();
 					break;
 				case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-					if (article.index > 0) {
-						stop();
-						article = DataManager.getCurrentArticles().get(
-								article.index - 1);
-						fillData();
-					}
+					prev();
 					break;
 				}
 			} catch (Exception e) {
 				Log.e(TAG, "Error in BroadcastReceiver", e);
 			}
 			abortBroadcast();
-		}
-
-		private void stop() {
-			isPlaying = false;
-			tts.stop();
 		}
 	}
 }

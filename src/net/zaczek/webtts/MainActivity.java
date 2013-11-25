@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
 import net.zaczek.webtts.Data.WebSiteRefAdapter;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -20,10 +21,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
 
-public class MainActivity extends AbstractListActivity implements
-		OnItemSelectedListener {
+public class MainActivity extends ListActivity {
 	private static final String TAG = "WebTTS";
 
 	private ArrayAdapter<WebSiteRef> adapter;
@@ -34,21 +33,6 @@ public class MainActivity extends AbstractListActivity implements
 		setContentView(R.layout.activity_main);
 		registerForContextMenu(getListView());
 		fillData();
-	}
-
-	@Override
-	public void onItemSelected(AdapterView<?> adapterView, View view, int pos,
-			long id) {
-		try {
-			speak(adapter.getItem(pos).text);
-		} catch (Exception ex) {
-			Log.e(TAG, ex.toString());
-		}
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> arg0) {
-
 	}
 
 	@Override
