@@ -19,6 +19,8 @@
 #   public *;
 #}
 
+-dontobfuscate
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable
 
 #ACRA specifics
 # we need line numbers in our stack traces otherwise they are pretty useless
