@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class WebSiteRefAdapter extends ArrayAdapter<WebSiteRef> {
@@ -33,14 +32,9 @@ public class WebSiteRefAdapter extends ArrayAdapter<WebSiteRef> {
 		WebSiteRef site = websites.get(position);
 		if (site != null) {
 			TextView text = (TextView) v.findViewById(R.id.text_row);
-			ImageView image = (ImageView) v.findViewById(R.id.image_row);
 
 			if (text != null) {
 				text.setText(site.text);
-			}
-
-			if (image != null) {
-				
 			}
 		}
 		return v;

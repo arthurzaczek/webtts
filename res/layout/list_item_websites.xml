@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/text_row"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingLeft="20dp">
-    
-	    <ImageView 
-	    android:id="@+id/image_row" 
-	    android:contentDescription="logo image"
-	    android:layout_width="wrap_content" 
-	    android:layout_height="wrap_content" 
-	    android:src="@drawable/menuicon_website_black" 
-	    android:layout_marginRight="20dp" />
-	    
-	     <TextView 
-		android:id="@+id/text_row"
-		android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam" 
-		android:layout_width="wrap_content" 
-        android:layout_height="wrap_content"
-        android:typeface="normal"
-		android:layout_gravity="center_vertical"
-		android:singleLine="true"
-		android:gravity="center_vertical"
-		android:scrollHorizontally="true" 
-		android:ellipsize="marquee"  
-		android:marqueeRepeatLimit="marquee_forever" />
-</LinearLayout>
+    android:drawableLeft="@drawable/menuicon_website_black"
+    android:drawablePadding="20dp"
+    android:ellipsize="marquee"
+    android:gravity="center_vertical"
+    android:marqueeRepeatLimit="marquee_forever"
+    android:scrollHorizontally="true"
+    android:singleLine="true"
+    android:text="Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam"
+    android:typeface="normal" >
+
+</TextView>
