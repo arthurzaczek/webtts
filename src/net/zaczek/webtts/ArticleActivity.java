@@ -2,7 +2,6 @@ package net.zaczek.webtts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 
 import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
@@ -136,7 +135,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 	@Override
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
-			tts.setLanguage(Locale.GERMAN);
+			// tts.setLanguage(Locale.GERMAN);
 			ttsInitialized = true;
 			play();
 		} else {
