@@ -10,7 +10,7 @@ import net.zaczek.webtts.R;
 @ReportsCrashes(
 		formKey = "", 
 		formUri = "",
-		mailTo = "droidremoteppt-support@googlegroups.com",
+		mailTo = "webtts-support@googlegroups.com",
 		mode = ReportingInteractionMode.NOTIFICATION,
         resToastText = R.string.crash_toast_text, // optional, displayed as soon as the crash occurs, before collecting data which can take a few seconds
         resNotifTickerText = R.string.crash_notif_ticker_text,
