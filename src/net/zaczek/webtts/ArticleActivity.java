@@ -269,7 +269,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 						.show();
 				txtArticle.setText(msg);
 			} else {
-				sentences = text.toString().split("\\.");
+				sentences = text.toString().split("\\.\\s+");
 				txtArticle.setText(String.format("%d chars, %d sentences",
 						text.length(), sentences.length));
 				progBar.setProgress(0);
