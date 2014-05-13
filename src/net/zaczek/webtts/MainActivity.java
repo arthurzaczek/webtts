@@ -95,63 +95,11 @@ public class MainActivity extends ListActivity {
 		case R.id.action_about:
 			startActivity(new Intent(this, AboutActivity.class));
 			return true;
-		case R.id.action_sync:
-			sync();
-			return true;
 		case R.id.action_exit:
 			finish();
 			return true;
 		}
 
 		return super.onMenuItemSelected(featureId, item);
-	}
-
-	private class SyncTask extends AsyncTask<Void, Void, Void> {
-		private String msg;
-		ProgressDialog dialog;
-		
-		public SyncTask()
-		{
-			dialog = new ProgressDialog(MainActivity.this);
-			dialog.setMessage("Syncing WebSites");
-		}
-
-		@Override
-		protected void onPreExecute() {
-			dialog.show();
-			super.onPreExecute();
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			try {
-				DataManager.downloadWebSitesSettings();
-			} catch (Exception ex) {
-				msg = ex.toString();
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			dialog.dismiss();
-			if (!TextUtils.isEmpty(msg)) {
-				Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT)
-						.show();
-			}
-			fillData();
-			syncTask = null;
-			super.onPostExecute(result);
-		}
-	}
-
-	private SyncTask syncTask;
-
-	private void sync() {
-		Log.d(TAG, "Syncing websites");
-		if (syncTask == null) {
-			syncTask = new SyncTask();
-			syncTask.execute();
-		}
 	}
 }

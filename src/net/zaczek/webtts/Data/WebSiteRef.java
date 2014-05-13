@@ -13,10 +13,7 @@ public class WebSiteRef implements Parcelable {
 	}
 
 	public String url;
-	public String text;
-	public String link_selector;
-	public String article_selector;
-	public String readmore_selector;
+	public String text;	
 	public Uri uri;
 
 	@Override
@@ -33,9 +30,6 @@ public class WebSiteRef implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeString(url);
 		dest.writeString(text);
-		dest.writeString(link_selector);
-		dest.writeString(article_selector);
-		dest.writeString(readmore_selector);
 		dest.writeString(uri.toString());
 	}
 	
@@ -53,9 +47,6 @@ public class WebSiteRef implements Parcelable {
     private WebSiteRef(Parcel in) {
         url = in.readString();
         text = in.readString();
-        link_selector = in.readString();
-        article_selector = in.readString();
-        readmore_selector = in.readString();
         uri = Uri.parse(in.readString());
     }
 }

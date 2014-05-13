@@ -217,20 +217,13 @@ public class ArticleActivity extends Activity implements OnInitListener {
 					final Document doc = response.parse();
 					Elements elements = null;
 
-					final String article_selector = DataManager
-							.getArticleSelector(webSite);
-
-					if (!TextUtils.isEmpty(article_selector)) {
-						elements = doc.select(article_selector);
-					} else {
-						for (String selector : defaultSelectors) {
-							Log.d(TAG, "Trying selector " + selector);
-							elements = doc.select(selector);
-							if (elements != null && elements.size() > 0) {
-								Log.d(TAG, "  -> found " + elements.size()
-										+ " elements");
-								break;
-							}
+					for (String selector : defaultSelectors) {
+						Log.d(TAG, "Trying selector " + selector);
+						elements = doc.select(selector);
+						if (elements != null && elements.size() > 0) {
+							Log.d(TAG, "  -> found " + elements.size()
+									+ " elements");
+							break;
 						}
 					}
 
@@ -249,15 +242,14 @@ public class ArticleActivity extends Activity implements OnInitListener {
 					}
 
 					// More Articles
-					if (!TextUtils.isEmpty(webSite.readmore_selector)) {
-						Elements links = doc.select(webSite.readmore_selector);
-						int idx = 0;
-						for (Element lnk : links) {
-							moreArticles.add(new ArticleRef(lnk
-									.attr("abs:href"), lnk.text(), idx));
-							idx++;
-						}
-					}
+//					Elements links = doc.select("a");
+//					int idx = 0;
+//					for (Element lnk : links) {
+//						moreArticles.add(new ArticleRef(lnk.attr("abs:href"),
+//								lnk.text(), idx));
+//						idx++;
+//					}
+
 				} else {
 					msg = response.statusMessage();
 				}
@@ -349,7 +341,8 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			Log.d(TAG, "MPR called");
 			final String intentAction = intent.getAction();
 			if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
-				Log.d(TAG, "Not ACTION_MEDIA_BUTTON, intent was " + intentAction);
+				Log.d(TAG, "Not ACTION_MEDIA_BUTTON, intent was "
+						+ intentAction);
 				return;
 			}
 			final KeyEvent event = (KeyEvent) intent

@@ -54,42 +54,6 @@
                 android:layout_below="@+id/textView2"
                 android:ems="10"
                 android:inputType="textUri" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/edtUrl"
-                android:layout_below="@+id/edtUrl"
-                android:layout_marginTop="20dp"
-                android:text="@string/link_selector" />
-
-            <EditText
-                android:id="@+id/edtLinkSelector"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/textView3"
-                android:layout_below="@+id/textView3"
-                android:ems="10"
-                android:inputType="text" />
-
-            <EditText
-                android:id="@+id/edtArticleSelector"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/textView4"
-                android:layout_below="@+id/textView4"
-                android:ems="10"
-                android:inputType="text" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/edtLinkSelector"
-                android:layout_below="@+id/edtLinkSelector"
-                android:layout_marginTop="20dp"
-                android:text="@string/article_selector" />
         </RelativeLayout>
     </ScrollView>
 

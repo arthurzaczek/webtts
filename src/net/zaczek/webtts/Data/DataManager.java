@@ -10,15 +10,12 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
 
 import org.jsoup.Jsoup;
 
 import android.net.Uri;
 import android.os.Environment;
-import android.text.TextUtils;
-import android.util.Log;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class DataManager {
@@ -90,21 +87,6 @@ public class DataManager {
 	public static ArrayList<WebSiteRef> readWebSites() throws IOException {
 		return readWebSitesInternal("websites.csv");
 	}
-
-	private static HashMap<String, WebSiteRef> website_configs_cache = null;
-
-	private static HashMap<String, WebSiteRef> ensureWebSitesConfigs()
-			throws IOException {
-		if (website_configs_cache == null) {
-			ArrayList<WebSiteRef> lst = readWebSitesInternal("websites_configs.csv");
-			website_configs_cache = new HashMap<String, WebSiteRef>();
-			for (WebSiteRef item : lst) {
-				website_configs_cache.put(item.uri.getHost(), item);
-			}
-		}
-		return website_configs_cache;
-	}
-
 	private static ArrayList<WebSiteRef> readWebSitesInternal(String file)
 			throws IOException {
 		final ArrayList<WebSiteRef> result = new ArrayList<WebSiteRef>();
@@ -116,12 +98,7 @@ public class DataManager {
 			while ((line = reader.readNext()) != null) {
 				final WebSiteRef url = new WebSiteRef();
 				url.text = line[0];
-				url.url = line[1];
-				url.link_selector = line[2];
-				url.article_selector = line[3];
-				if (line.length > 4) {
-					url.readmore_selector = line[4];
-				}
+				url.url = line[1];				
 
 				url.uri = Uri.parse(url.url.toLowerCase(Locale.getDefault()));
 
@@ -140,12 +117,7 @@ public class DataManager {
 			sw.write("name,url,link_selector,article_selector,readmore_selector\n");
 			for (WebSiteRef url : sites) {
 				sw.write("\"" + url.text + "\"");
-				sw.write(",\"" + url.url + "\"");
-				sw.write(",\"" + url.link_selector + "\"");
-				sw.write(",\"" + url.article_selector + "\"");
-				if (!TextUtils.isEmpty(url.readmore_selector)) {
-					sw.write(",\"" + url.readmore_selector + "\"");
-				}
+				sw.write(",\"" + url.url + "\"");				
 				sw.write("\n");
 			}
 		} finally {
@@ -153,20 +125,6 @@ public class DataManager {
 			sw.close();
 		}
 	}
-
-	public static void downloadWebSitesSettings() throws IOException {
-		final StringBuffer urls = downloadText(new URL(
-				"https://docs.google.com/spreadsheet/pub?key=0Au6e93kxiTMhdGdUVmZvdEdZcHdvaVBZUlp0WFpYU2c&single=true&gid=0&output=csv"));
-		final OutputStreamWriter sw = openWrite("websites_configs.csv", false);
-		try {
-			sw.write(urls.toString());
-		} finally {
-			sw.flush();
-			sw.close();
-		}
-		website_configs_cache = null;
-	}
-
 	private static ArrayList<ArticleRef> globalArticles;
 
 	public static ArrayList<ArticleRef> getCurrentArticles() {
@@ -175,37 +133,5 @@ public class DataManager {
 
 	public static void setCurrentArticles(ArrayList<ArticleRef> value) {
 		globalArticles = value;
-	}
-
-	public static String getLinkSelector(WebSiteRef webSite) {
-		if (!TextUtils.isEmpty(webSite.link_selector)) {
-			return webSite.link_selector;
-		}
-		try {
-			ensureWebSitesConfigs();
-			WebSiteRef cfg = website_configs_cache.get(webSite.uri.getHost());
-			if(cfg != null && !TextUtils.isEmpty(cfg.link_selector)) {
-				return cfg.link_selector;
-			}
-		} catch (IOException e) {
-			Log.e("WebTTS", "Error reading link selector", e);
-		}
-		return null;
-	}
-
-	public static String getArticleSelector(WebSiteRef webSite) {
-		if (!TextUtils.isEmpty(webSite.article_selector)) {
-			return webSite.article_selector;
-		}
-		try {
-			ensureWebSitesConfigs();
-			WebSiteRef cfg = website_configs_cache.get(webSite.uri.getHost());
-			if(cfg != null && !TextUtils.isEmpty(cfg.article_selector)) {
-				return cfg.article_selector;
-			}
-		} catch (IOException e) {
-			Log.e("WebTTS", "Error reading article selector", e);
-		}
-		return null;
 	}
 }

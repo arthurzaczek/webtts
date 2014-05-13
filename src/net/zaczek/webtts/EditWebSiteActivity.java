@@ -24,8 +24,6 @@ public class EditWebSiteActivity extends Activity {
 
 	EditText edtName;
 	EditText edtUrl;
-	EditText edtLinkSelector;
-	EditText edtArticleSelector;
 
 	private WebSiteRef webSite;
 
@@ -36,8 +34,6 @@ public class EditWebSiteActivity extends Activity {
 
 		edtName = (EditText) findViewById(R.id.edtName);
 		edtUrl = (EditText) findViewById(R.id.edtUrl);
-		edtLinkSelector = (EditText) findViewById(R.id.edtLinkSelector);
-		edtArticleSelector = (EditText) findViewById(R.id.edtArticleSelector);
 
 		Intent intent = getIntent();
 		webSite = intent.getParcelableExtra("website");
@@ -45,8 +41,6 @@ public class EditWebSiteActivity extends Activity {
 		if (webSite != null) {
 			edtName.setText(webSite.text);
 			edtUrl.setText(webSite.url);
-			edtLinkSelector.setText(webSite.link_selector);
-			edtArticleSelector.setText(webSite.article_selector);
 		}
 
 		// Show the Up button in the action bar.
@@ -79,8 +73,6 @@ public class EditWebSiteActivity extends Activity {
 
 			local.text = edtName.getText().toString();
 			local.url = edtUrl.getText().toString();
-			local.link_selector = edtLinkSelector.getText().toString();
-			local.article_selector = edtArticleSelector.getText().toString();
 
 			DataManager.writeWebSites(sites);
 

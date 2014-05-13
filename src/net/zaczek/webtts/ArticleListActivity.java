@@ -105,11 +105,7 @@ public class ArticleListActivity extends ListActivity {
 			try {
 				articles = new ArrayList<ArticleRef>();
 				articlesMap = new HashMap<Integer, ArrayList<ArticleRef>>();
-				String link_selector = DataManager.getLinkSelector(webSite);
-				useMap = TextUtils.isEmpty(link_selector);
-				if (TextUtils.isEmpty(link_selector)) {
-					link_selector = "a";
-				}
+				final String link_selector = "a";				
 
 				Log.i(TAG, "Downloading article list from " + url);
 				final Response response = DataManager.jsoupConnect(url)

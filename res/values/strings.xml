@@ -4,7 +4,6 @@
     <string name="app_name">WebTTS</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    <string name="sync">Download configs</string>
     <string name="about">About</string>
     <string name="exit">Exit</string>
     <string name="title_activity_edit_web_site">Edit web site</string>
