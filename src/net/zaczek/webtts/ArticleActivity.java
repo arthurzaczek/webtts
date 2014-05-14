@@ -242,13 +242,13 @@ public class ArticleActivity extends Activity implements OnInitListener {
 					}
 
 					// More Articles
-//					Elements links = doc.select("a");
-//					int idx = 0;
-//					for (Element lnk : links) {
-//						moreArticles.add(new ArticleRef(lnk.attr("abs:href"),
-//								lnk.text(), idx));
-//						idx++;
-//					}
+					// Elements links = doc.select("a");
+					// int idx = 0;
+					// for (Element lnk : links) {
+					// moreArticles.add(new ArticleRef(lnk.attr("abs:href"),
+					// lnk.text(), idx));
+					// idx++;
+					// }
 
 				} else {
 					msg = response.statusMessage();
@@ -269,7 +269,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 						.show();
 				txtArticle.setText(msg);
 			} else {
-				sentences = text.toString().split("\\.\\s+");
+				sentences = text.toString().split("(?<=[a-z])\\.\\s+");
 				txtArticle.setText(String.format("%d chars, %d sentences",
 						text.length(), sentences.length));
 				progBar.setProgress(0);
@@ -338,7 +338,8 @@ public class ArticleActivity extends Activity implements OnInitListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(TAG, "MPR called");
+			Toast.makeText(ArticleActivity.this, "MPR called",
+					Toast.LENGTH_SHORT).show();
 			final String intentAction = intent.getAction();
 			if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
 				Log.d(TAG, "Not ACTION_MEDIA_BUTTON, intent was "
