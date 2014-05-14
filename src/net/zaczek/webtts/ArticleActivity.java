@@ -338,8 +338,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Toast.makeText(ArticleActivity.this, "MPR called",
-					Toast.LENGTH_SHORT).show();
+			Log.d(TAG, "MPR called");
 			final String intentAction = intent.getAction();
 			if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
 				Log.d(TAG, "Not ACTION_MEDIA_BUTTON, intent was "
