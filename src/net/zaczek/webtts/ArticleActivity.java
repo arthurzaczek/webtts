@@ -353,21 +353,24 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			}
 			try {
 				final int action = event.getAction();
-				Log.d(TAG, "Event.action = " + action);
-				switch (action) {
-				case KeyEvent.KEYCODE_MEDIA_PLAY:
-					if (isPlaying) {
-						stop();
-					} else {
-						play();
+				final int keyCode = event.getKeyCode();
+				Log.d(TAG, "Event.action = " + action + "; key = " + keyCode);
+				if (action == KeyEvent.ACTION_DOWN) {
+					switch (keyCode) {
+					case KeyEvent.KEYCODE_MEDIA_PLAY:
+						if (isPlaying) {
+							stop();
+						} else {
+							play();
+						}
+						break;
+					case KeyEvent.KEYCODE_MEDIA_NEXT:
+						next();
+						break;
+					case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+						prev();
+						break;
 					}
-					break;
-				case KeyEvent.KEYCODE_MEDIA_NEXT:
-					next();
-					break;
-				case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-					prev();
-					break;
 				}
 			} catch (Exception e) {
 				Log.e(TAG, "Error in BroadcastReceiver", e);
