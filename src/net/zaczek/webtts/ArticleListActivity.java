@@ -48,6 +48,8 @@ public class ArticleListActivity extends ListActivity {
 		if (webSite != null) {
 			setTitle(webSite.text);
 		}
+		
+		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
 	}
 
@@ -175,9 +177,10 @@ public class ArticleListActivity extends ListActivity {
 			}
 			DataManager.setCurrentArticles(articles);
 			adapter = new ArrayAdapter<ArticleRef>(ArticleListActivity.this,
-					android.R.layout.simple_list_item_1, articles);
+					android.R.layout.simple_list_item_activated_1, articles);
 			setListAdapter(adapter);
 			setSelection(0);
+			getListView().setItemChecked(0, true);
 
 			super.onPostExecute(result);
 		}

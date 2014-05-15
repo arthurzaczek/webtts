@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
-import net.zaczek.webtts.Data.WebSiteRefAdapter;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -32,6 +31,7 @@ public class MainActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		registerForContextMenu(getListView());
+		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
 	}
 
@@ -49,9 +49,10 @@ public class MainActivity extends ListActivity {
 			if (data.size() == 0) {
 				data.add(new WebSiteRef("Please sync..."));
 			}
-			adapter = new WebSiteRefAdapter(this, data);
+			adapter = new ArrayAdapter<WebSiteRef>(this, android.R.layout.simple_list_item_activated_1, data);
 			setListAdapter(adapter);
 			setSelection(0);
+			getListView().setItemChecked(0, true);
 		} catch (Exception ex) {
 			Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
 		}

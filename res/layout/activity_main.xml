@@ -11,8 +11,5 @@
     <ListView  
     	android:id="@id/android:list"
     	android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:focusable="true"
-		android:headerDividersEnabled="true"
-		android:fadingEdge="none"  />
+	    android:layout_height="fill_parent" />
 </RelativeLayout>

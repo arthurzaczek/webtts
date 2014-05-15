@@ -12,8 +12,7 @@
         android:id="@id/android:list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/btnPlayAll"
-        tools:listitem="@android:layout/simple_list_item_1" />
+        android:layout_above="@+id/btnPlayAll" />
 
     <ImageButton
         android:id="@+id/btnPlayAll"
