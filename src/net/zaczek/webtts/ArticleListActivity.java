@@ -45,7 +45,7 @@ public class ArticleListActivity extends ListActivity {
 
 		Intent intent = getIntent();
 		webSite = intent.getParcelableExtra("website");
-		if(webSite != null) {
+		if (webSite != null) {
 			setTitle(webSite.text);
 		}
 		fillData();
@@ -85,7 +85,6 @@ public class ArticleListActivity extends ListActivity {
 		private String url;
 		private ArrayList<ArticleRef> articles;
 		private HashMap<Integer, ArrayList<ArticleRef>> articlesMap;
-		private boolean useMap = true;
 		private ProgressDialog dialog;
 
 		public FillDataTask(String url) {
@@ -105,7 +104,7 @@ public class ArticleListActivity extends ListActivity {
 			try {
 				articles = new ArrayList<ArticleRef>();
 				articlesMap = new HashMap<Integer, ArrayList<ArticleRef>>();
-				final String link_selector = "a";				
+				final String link_selector = "a";
 
 				Log.i(TAG, "Downloading article list from " + url);
 				final Response response = DataManager.jsoupConnect(url)
@@ -119,28 +118,25 @@ public class ArticleListActivity extends ListActivity {
 					String lnkText;
 					String href;
 					ArticleRef aRef;
-					int idx = 0;
 					int segmentCount;
 					for (Element lnk : links) {
 						href = lnk.attr("abs:href");
 						lnkText = lnk.text();
 						if (!TextUtils.isEmpty(lnkText)) {
 							Log.d(TAG, href);
-							aRef = new ArticleRef(href, lnkText, idx);
+							aRef = new ArticleRef(href, lnkText, -1);
 
-							if (useMap) {
-								segmentCount = href.split("/").length;
-								if (articlesMap.containsKey(segmentCount)) {
-									articlesMap.get(segmentCount).add(aRef);
-								} else {
-									ArrayList<ArticleRef> tmpList = new ArrayList<ArticleRef>();
-									tmpList.add(aRef);
-									articlesMap.put(segmentCount, tmpList);
-								}
+							segmentCount = href.split("/").length;
+							if (articlesMap.containsKey(segmentCount)) {
+								final ArrayList<ArticleRef> tmpList = articlesMap.get(segmentCount);
+								aRef.setIndex(tmpList.size());
+								tmpList.add(aRef);
 							} else {
-								articles.add(aRef);
+								final ArrayList<ArticleRef> tmpList = new ArrayList<ArticleRef>();
+								aRef.setIndex(0);
+								tmpList.add(aRef);
+								articlesMap.put(segmentCount, tmpList);
 							}
-							idx++;
 						}
 					}
 				} else {
@@ -164,7 +160,7 @@ public class ArticleListActivity extends ListActivity {
 			}
 
 			task = null;
-			if (useMap && articlesMap.size() > 0) {
+			if (articlesMap.size() > 0) {
 				// articles = articlesMap.Values.OrderBy(lst =>
 				// lst.Count()).Last();
 				// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

@@ -50,4 +50,8 @@ public class ArticleRef implements Parcelable {
         text = in.readString();
         index = in.readInt();
     }
+
+	public void setIndex(int idx) {
+		index = idx;		
+	}
 }
