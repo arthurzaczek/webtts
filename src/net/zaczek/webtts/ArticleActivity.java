@@ -99,6 +99,35 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		article = intent.getParcelableExtra("article");
 		webSite = intent.getParcelableExtra("website");
 		fillData();
+				
+		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+		mediaFilter.setPriority(9999);
+		this.registerReceiver(mediaPlayerReceiver, mediaFilter);
+	}
+	
+	@Override
+	protected void onResume() {
+		wl.acquire();
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause() {
+		wl.release();
+		super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		
+		if (tts != null) {
+			tts.stop();
+			tts.shutdown();
+		}		
+		
+		this.unregisterReceiver(mediaPlayerReceiver);
+		super.onPause();
 	}
 
 	private void play() {
@@ -140,31 +169,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			play();
 		} else {
 			Log.e(TAG, "Initilization Failed");
-		}
-	}
-
-	@Override
-	protected void onResume() {
-		wl.acquire();
-		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-		mediaFilter.setPriority(9999);
-		this.registerReceiver(mediaPlayerReceiver, mediaFilter);
-		super.onResume();
-	}
-
-	@Override
-	protected void onPause() {
-		wl.release();
-		this.unregisterReceiver(mediaPlayerReceiver);
-		super.onPause();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		if (tts != null) {
-			tts.stop();
-			tts.shutdown();
 		}
 	}
 
