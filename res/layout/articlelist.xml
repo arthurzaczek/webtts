@@ -16,12 +16,32 @@
 
     <ImageButton
         android:id="@+id/btnPlayAll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/play"
         android:src="@android:drawable/ic_media_play"
         android:onClick="onPlayAll" />
+    
+     <ImageButton
+        android:id="@+id/btnPrev"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignLeft="@id/android:list"
+        android:layout_alignTop="@+id/btnPlayAll"
+        android:contentDescription="@string/prev"
+        android:onClick="onPrev"
+        android:src="@android:drawable/ic_media_previous" />
+
+    <ImageButton
+        android:id="@+id/btnNext"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignRight="@id/android:list"
+        android:layout_alignTop="@+id/btnPlayAll"
+        android:contentDescription="@string/next"
+        android:onClick="onNext"
+        android:src="@android:drawable/ic_media_next" />
 
 </RelativeLayout>

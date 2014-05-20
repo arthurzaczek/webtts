@@ -58,6 +58,12 @@ public class ArticleListActivity extends ListActivity {
 			play(0);
 		}
 	}
+	
+	public void onNext(View v) {
+	}
+
+	public void onPrev(View v) {
+	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {

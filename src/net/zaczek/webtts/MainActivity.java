@@ -58,6 +58,12 @@ public class MainActivity extends ListActivity {
 		}
 	}
 	
+	public void onNext(View v) {
+	}
+
+	public void onPrev(View v) {
+	}
+	
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
