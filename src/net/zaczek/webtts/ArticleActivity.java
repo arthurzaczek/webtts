@@ -1,11 +1,9 @@
 package net.zaczek.webtts;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
-import net.zaczek.webtts.Data.WebSiteRef;
 
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
@@ -56,8 +54,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 	private String[] sentences;
 	private int currentSentenceIdx = 0;
 
-	private ArrayList<ArticleRef> moreArticles;
-	private WebSiteRef webSite;
+	// private ArrayList<ArticleRef> moreArticles;
 	private ArticleRef article;
 
 	private MPR mediaPlayerReceiver = new MPR();
@@ -97,7 +94,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 
 		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
-		webSite = intent.getParcelableExtra("website");
 		fillData();
 
 		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
@@ -201,7 +197,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 					"div[id=content], div.content", "div[id=main], div.main", };
 			url = article.url;
 			text = new StringBuilder();
-			moreArticles = new ArrayList<ArticleRef>();
+			// moreArticles = new ArrayList<ArticleRef>();
 			txtArticle.setText("Loading " + url);
 		}
 

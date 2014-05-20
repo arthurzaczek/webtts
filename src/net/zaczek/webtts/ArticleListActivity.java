@@ -74,7 +74,6 @@ public class ArticleListActivity extends ListActivity {
 		final ArticleRef a = adapter.getItem(position);
 		final Intent i = new Intent(this, ArticleActivity.class);
 		i.putExtra("article", a);
-		i.putExtra("website", webSite);
 		startActivity(i);
 	}
 
