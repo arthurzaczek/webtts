@@ -2,6 +2,7 @@ package net.zaczek.webtts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
@@ -17,6 +18,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,7 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class ArticleListActivity extends ListActivity {
+public class ArticleListActivity extends ListActivity implements OnInitListener {
 	private static final String TAG = "webtts";
 
 	private static final int ABOUT_ID = 1;
@@ -35,6 +38,8 @@ public class ArticleListActivity extends ListActivity {
 
 	private ArrayAdapter<ArticleRef> adapter;
 	private WebSiteRef webSite;
+	private TextToSpeech tts;
+	private boolean ttsInitialized = false;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -48,21 +53,48 @@ public class ArticleListActivity extends ListActivity {
 		if (webSite != null) {
 			setTitle(webSite.text);
 		}
-		
+
+		tts = new TextToSpeech(this, this);
+
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
 	}
 
-	public void onPlayAll(View v) {
-		if (adapter.getCount() > 0) {
-			play(0);
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+		if (tts != null) {
+			tts.stop();
+			tts.shutdown();
 		}
 	}
-	
+
+	public void onPlay(View v) {
+		play(getListView().getCheckedItemPosition());
+	}
+
 	public void onNext(View v) {
+		if (getListAdapter().getCount() == 0)
+			return;
+		final int idx = getListView().getCheckedItemPosition();
+		if (idx + 1 < getListAdapter().getCount()) {
+			select(idx + 1);
+		} else {
+			select(0);
+		}
 	}
 
 	public void onPrev(View v) {
+		final int count = getListAdapter().getCount();
+		if (count == 0)
+			return;
+		final int idx = getListView().getCheckedItemPosition();
+		if (idx > 0) {
+			select(idx - 1);
+		} else {
+			select(count - 1);
+		}
 	}
 
 	@Override
@@ -71,6 +103,9 @@ public class ArticleListActivity extends ListActivity {
 	}
 
 	private void play(int position) {
+		if (position < 0 || position >= getListAdapter().getCount())
+			return;
+
 		final ArticleRef a = adapter.getItem(position);
 		final Intent i = new Intent(this, ArticleActivity.class);
 		i.putExtra("article", a);
@@ -81,6 +116,17 @@ public class ArticleListActivity extends ListActivity {
 		if (task == null) {
 			task = new FillDataTask(webSite.url);
 			task.execute();
+		}
+	}
+
+	private void select(int idx) {
+		if (idx >= getListAdapter().getCount())
+			return;
+		setSelection(idx);
+		getListView().setItemChecked(idx, true);
+		if (ttsInitialized) {
+			final ArticleRef a = adapter.getItem(idx);
+			tts.speak(a.text, TextToSpeech.QUEUE_FLUSH, null);
 		}
 	}
 
@@ -135,7 +181,8 @@ public class ArticleListActivity extends ListActivity {
 
 							segmentCount = href.split("/").length;
 							if (articlesMap.containsKey(segmentCount)) {
-								final ArrayList<ArticleRef> tmpList = articlesMap.get(segmentCount);
+								final ArrayList<ArticleRef> tmpList = articlesMap
+										.get(segmentCount);
 								aRef.setIndex(tmpList.size());
 								tmpList.add(aRef);
 							} else {
@@ -184,9 +231,7 @@ public class ArticleListActivity extends ListActivity {
 			adapter = new ArrayAdapter<ArticleRef>(ArticleListActivity.this,
 					android.R.layout.simple_list_item_activated_1, articles);
 			setListAdapter(adapter);
-			setSelection(0);
-			getListView().setItemChecked(0, true);
-
+			select(0);
 			super.onPostExecute(result);
 		}
 	}
@@ -216,5 +261,18 @@ public class ArticleListActivity extends ListActivity {
 		}
 
 		return super.onMenuItemSelected(featureId, item);
+	}
+
+	@Override
+	public void onInit(int status) {
+		if (status == TextToSpeech.SUCCESS) {
+			// tts.setLanguage(Locale.GERMAN);
+			ttsInitialized = true;
+			select(getListView().getCheckedItemPosition()); // reselect to
+															// anounce current
+															// item
+		} else {
+			Log.e(TAG, "Initilization Failed");
+		}
 	}
 }

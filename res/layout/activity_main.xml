@@ -15,6 +15,16 @@
         android:layout_above="@+id/btnPrev" />
     
     <ImageButton
+        android:id="@+id/btnPlay"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/play"
+        android:src="@android:drawable/ic_media_play"
+        android:onClick="onPlay" />
+    
+    <ImageButton
         android:id="@+id/btnPrev"
         android:layout_width="70dp"
         android:layout_height="70dp"

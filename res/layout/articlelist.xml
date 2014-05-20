@@ -12,24 +12,24 @@
         android:id="@id/android:list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/btnPlayAll" />
+        android:layout_above="@+id/btnPlay" />
 
     <ImageButton
-        android:id="@+id/btnPlayAll"
+        android:id="@+id/btnPlay"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/play"
         android:src="@android:drawable/ic_media_play"
-        android:onClick="onPlayAll" />
+        android:onClick="onPlay" />
     
      <ImageButton
         android:id="@+id/btnPrev"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignLeft="@id/android:list"
-        android:layout_alignTop="@+id/btnPlayAll"
+        android:layout_alignTop="@+id/btnPlay"
         android:contentDescription="@string/prev"
         android:onClick="onPrev"
         android:src="@android:drawable/ic_media_previous" />
@@ -39,7 +39,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignRight="@id/android:list"
-        android:layout_alignTop="@+id/btnPlayAll"
+        android:layout_alignTop="@+id/btnPlay"
         android:contentDescription="@string/next"
         android:onClick="onNext"
         android:src="@android:drawable/ic_media_next" />

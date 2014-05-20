@@ -123,7 +123,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		}
 
 		this.unregisterReceiver(mediaPlayerReceiver);
-		super.onPause();
 	}
 
 	private void play() {

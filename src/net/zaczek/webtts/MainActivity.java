@@ -7,6 +7,8 @@ import net.zaczek.webtts.Data.WebSiteRef;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -18,23 +20,44 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends ListActivity implements OnInitListener {
 	private static final String TAG = "WebTTS";
 
 	private ArrayAdapter<WebSiteRef> adapter;
+	private TextToSpeech tts;
+	private boolean ttsInitialized = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Starting WebTTS main activity");
 		setContentView(R.layout.activity_main);
+
+		tts = new TextToSpeech(this, this);
+
 		registerForContextMenu(getListView());
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
 	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+		if (tts != null) {
+			tts.stop();
+			tts.shutdown();
+		}
+	}
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
+		play(position);
+	}
+
+	private void play(int position) {
+		if (position < 0 || position >= getListAdapter().getCount()) return;		
+		
 		Intent i = new Intent(this, ArticleListActivity.class);
 		WebSiteRef website = adapter.getItem(position);
 		Log.i(TAG, "Opening website " + website.text);
@@ -50,17 +73,46 @@ public class MainActivity extends ListActivity {
 			}
 			adapter = new ArrayAdapter<WebSiteRef>(this, android.R.layout.simple_list_item_activated_1, data);
 			setListAdapter(adapter);
-			setSelection(0);
-			getListView().setItemChecked(0, true);
+			select(0);
 		} catch (Exception ex) {
 			Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
 		}
 	}
+
+	private void select(int idx) {
+		if(idx >= getListAdapter().getCount()) return;		
+		setSelection(idx);
+		getListView().setItemChecked(idx, true);
+		if(ttsInitialized) {
+			final WebSiteRef ws = adapter.getItem(idx);
+			tts.speak(ws.text, TextToSpeech.QUEUE_FLUSH, null);
+		}
+	}
 	
 	public void onNext(View v) {
+		if(getListAdapter().getCount() == 0) return;
+		final int idx = getListView().getCheckedItemPosition();
+		if(idx + 1 < getListAdapter().getCount()) {
+			select(idx + 1);
+		} else {
+			select(0);
+		}
 	}
 
 	public void onPrev(View v) {
+		final int count = getListAdapter().getCount();
+		if(count == 0) return;
+		final int idx = getListView().getCheckedItemPosition();
+		if(idx > 0) {
+			select(idx - 1);
+		} else {
+			select(count - 1);
+		}
+	}
+	
+	public void onPlay(View v) {
+		final int idx = getListView().getCheckedItemPosition();
+		play(idx);
 	}
 	
 	@Override
@@ -107,5 +159,16 @@ public class MainActivity extends ListActivity {
 		}
 
 		return super.onMenuItemSelected(featureId, item);
+	}
+	
+	@Override
+	public void onInit(int status) {
+		if (status == TextToSpeech.SUCCESS) {
+			// tts.setLanguage(Locale.GERMAN);
+			ttsInitialized = true;
+			select(getListView().getCheckedItemPosition()); // reselect to anounce current item
+		} else {
+			Log.e(TAG, "Initilization Failed");
+		}
 	}
 }
