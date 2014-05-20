@@ -99,12 +99,12 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		article = intent.getParcelableExtra("article");
 		webSite = intent.getParcelableExtra("website");
 		fillData();
-				
+
 		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
 		mediaFilter.setPriority(9999);
 		this.registerReceiver(mediaPlayerReceiver, mediaFilter);
 	}
-	
+
 	@Override
 	protected void onResume() {
 		wl.acquire();
@@ -120,12 +120,12 @@ public class ArticleActivity extends Activity implements OnInitListener {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
+
 		if (tts != null) {
 			tts.stop();
 			tts.shutdown();
-		}		
-		
+		}
+
 		this.unregisterReceiver(mediaPlayerReceiver);
 		super.onPause();
 	}
@@ -238,11 +238,14 @@ public class ArticleActivity extends Activity implements OnInitListener {
 					}
 
 					for (Element e : elements) {
-						text.append(e.text());
-						if (text.charAt(text.length() - 1) != '.') {
-							text.append(".");
+						final String innerText = e.text();
+						if (!TextUtils.isEmpty(innerText)) {
+							text.append(innerText);
+							if (text.charAt(text.length() - 1) != '.') {
+								text.append(".");
+							}
+							text.append("\n");
 						}
-						text.append("\n");
 					}
 
 					// More Articles
