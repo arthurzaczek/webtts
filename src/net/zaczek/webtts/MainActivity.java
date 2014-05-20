@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -29,6 +26,7 @@ public class MainActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.i(TAG, "Starting WebTTS main activity");
 		setContentView(R.layout.activity_main);
 		registerForContextMenu(getListView());
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -39,6 +37,7 @@ public class MainActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		Intent i = new Intent(this, ArticleListActivity.class);
 		WebSiteRef website = adapter.getItem(position);
+		Log.i(TAG, "Opening website " + website.text);
 		i.putExtra("website", website);
 		startActivity(i);
 	}
