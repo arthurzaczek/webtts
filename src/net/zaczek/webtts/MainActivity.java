@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
+import net.zaczek.webtts.mpr.MediaPlayerReceiver;
+import net.zaczek.webtts.mpr.RemoteControlListener;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,12 +22,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity implements OnInitListener {
+public class MainActivity extends ListActivity implements OnInitListener,
+		RemoteControlListener {
 	private static final String TAG = "WebTTS";
 
 	private ArrayAdapter<WebSiteRef> adapter;
 	private TextToSpeech tts;
 	private boolean ttsInitialized = false;
+	private MediaPlayerReceiver mediaPlayerReceiver = new MediaPlayerReceiver(
+			this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +41,12 @@ public class MainActivity extends ListActivity implements OnInitListener {
 		tts = new TextToSpeech(this, this);
 
 		registerForContextMenu(getListView());
+		mediaPlayerReceiver.registerReceiver(this);
+
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -48,6 +55,7 @@ public class MainActivity extends ListActivity implements OnInitListener {
 			tts.stop();
 			tts.shutdown();
 		}
+		mediaPlayerReceiver.unregisterReceiver(this);
 	}
 
 	@Override
@@ -56,8 +64,9 @@ public class MainActivity extends ListActivity implements OnInitListener {
 	}
 
 	private void play(int position) {
-		if (position < 0 || position >= getListAdapter().getCount()) return;		
-		
+		if (position < 0 || position >= getListAdapter().getCount())
+			return;
+
 		Intent i = new Intent(this, ArticleListActivity.class);
 		WebSiteRef website = adapter.getItem(position);
 		Log.i(TAG, "Opening website " + website.text);
@@ -71,7 +80,8 @@ public class MainActivity extends ListActivity implements OnInitListener {
 			if (data.size() == 0) {
 				data.add(new WebSiteRef("Please sync..."));
 			}
-			adapter = new ArrayAdapter<WebSiteRef>(this, android.R.layout.simple_list_item_activated_1, data);
+			adapter = new ArrayAdapter<WebSiteRef>(this,
+					android.R.layout.simple_list_item_activated_1, data);
 			setListAdapter(adapter);
 			select(0);
 		} catch (Exception ex) {
@@ -80,53 +90,65 @@ public class MainActivity extends ListActivity implements OnInitListener {
 	}
 
 	private void select(int idx) {
-		if(idx >= getListAdapter().getCount()) return;		
+		if (idx >= getListAdapter().getCount())
+			return;
 		setSelection(idx);
 		getListView().setItemChecked(idx, true);
-		if(ttsInitialized) {
+		if (ttsInitialized) {
 			final WebSiteRef ws = adapter.getItem(idx);
 			tts.speak(ws.text, TextToSpeech.QUEUE_FLUSH, null);
 		}
 	}
-	
-	public void onNext(View v) {
-		if(getListAdapter().getCount() == 0) return;
+
+	private void next() {
+		if (getListAdapter().getCount() == 0)
+			return;
 		final int idx = getListView().getCheckedItemPosition();
-		if(idx + 1 < getListAdapter().getCount()) {
+		if (idx + 1 < getListAdapter().getCount()) {
 			select(idx + 1);
 		} else {
 			select(0);
 		}
 	}
 
-	public void onPrev(View v) {
+	private void prev() {
 		final int count = getListAdapter().getCount();
-		if(count == 0) return;
+		if (count == 0)
+			return;
 		final int idx = getListView().getCheckedItemPosition();
-		if(idx > 0) {
+		if (idx > 0) {
 			select(idx - 1);
 		} else {
 			select(count - 1);
 		}
 	}
-	
+
 	public void onPlay(View v) {
 		final int idx = getListView().getCheckedItemPosition();
 		play(idx);
 	}
 	
+	public void onNext(View v) {
+		next();
+	}
+
+	public void onPrev(View v) {
+		prev();
+	}
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		getMenuInflater().inflate(R.menu.main_list_item, menu);
 	}
-	
+
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		int itemId = item.getItemId();
 		switch (itemId) {
 		case R.id.action_edit:
-			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+			AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+					.getMenuInfo();
 			Intent i = new Intent(this, EditWebSiteActivity.class);
 			WebSiteRef website = adapter.getItem(info.position);
 			i.putExtra("website", website);
@@ -160,15 +182,31 @@ public class MainActivity extends ListActivity implements OnInitListener {
 
 		return super.onMenuItemSelected(featureId, item);
 	}
-	
+
 	@Override
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
 			// tts.setLanguage(Locale.GERMAN);
 			ttsInitialized = true;
-			select(getListView().getCheckedItemPosition()); // reselect to anounce current item
+			select(getListView().getCheckedItemPosition()); // reselect to
+															// anounce current
+															// item
 		} else {
 			Log.e(TAG, "Initilization Failed");
 		}
+	}
+	
+	@Override
+	public void onMediaPlay() {
+	}
+
+	@Override
+	public void onMediaNext() {
+		next();
+	}
+
+	@Override
+	public void onMediaPrev() {
+		prev();
 	}
 }

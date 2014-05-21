@@ -6,6 +6,8 @@ import java.util.HashMap;
 import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
 import net.zaczek.webtts.Data.WebSiteRef;
+import net.zaczek.webtts.mpr.MediaPlayerReceiver;
+import net.zaczek.webtts.mpr.RemoteControlListener;
 
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
@@ -30,7 +32,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class ArticleListActivity extends ListActivity implements OnInitListener {
+public class ArticleListActivity extends ListActivity implements
+		OnInitListener, RemoteControlListener {
 	private static final String TAG = "webtts";
 
 	private static final int ABOUT_ID = 1;
@@ -40,6 +43,8 @@ public class ArticleListActivity extends ListActivity implements OnInitListener 
 	private WebSiteRef webSite;
 	private TextToSpeech tts;
 	private boolean ttsInitialized = false;
+	private MediaPlayerReceiver mediaPlayerReceiver = new MediaPlayerReceiver(
+			this);
 
 	/** Called when the activity is first created. */
 	@Override
@@ -55,6 +60,7 @@ public class ArticleListActivity extends ListActivity implements OnInitListener 
 		}
 
 		tts = new TextToSpeech(this, this);
+		mediaPlayerReceiver.registerReceiver(this);
 
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
@@ -68,13 +74,21 @@ public class ArticleListActivity extends ListActivity implements OnInitListener 
 			tts.stop();
 			tts.shutdown();
 		}
+		mediaPlayerReceiver.unregisterReceiver(this);
+	}
+	
+	private void select(int idx) {
+		if (idx >= getListAdapter().getCount())
+			return;
+		setSelection(idx);
+		getListView().setItemChecked(idx, true);
+		if (ttsInitialized) {
+			final ArticleRef a = adapter.getItem(idx);
+			tts.speak(a.text, TextToSpeech.QUEUE_FLUSH, null);
+		}
 	}
 
-	public void onPlay(View v) {
-		play(getListView().getCheckedItemPosition());
-	}
-
-	public void onNext(View v) {
+	private void next() {
 		if (getListAdapter().getCount() == 0)
 			return;
 		final int idx = getListView().getCheckedItemPosition();
@@ -85,7 +99,7 @@ public class ArticleListActivity extends ListActivity implements OnInitListener 
 		}
 	}
 
-	public void onPrev(View v) {
+	private void prev() {
 		final int count = getListAdapter().getCount();
 		if (count == 0)
 			return;
@@ -102,6 +116,18 @@ public class ArticleListActivity extends ListActivity implements OnInitListener 
 		play(position);
 	}
 
+	public void onPlay(View v) {
+		play(getListView().getCheckedItemPosition());
+	}
+
+	public void onNext(View v) {
+		next();
+	}
+
+	public void onPrev(View v) {
+		prev();
+	}
+
 	private void play(int position) {
 		if (position < 0 || position >= getListAdapter().getCount())
 			return;
@@ -116,17 +142,6 @@ public class ArticleListActivity extends ListActivity implements OnInitListener 
 		if (task == null) {
 			task = new FillDataTask(webSite.url);
 			task.execute();
-		}
-	}
-
-	private void select(int idx) {
-		if (idx >= getListAdapter().getCount())
-			return;
-		setSelection(idx);
-		getListView().setItemChecked(idx, true);
-		if (ttsInitialized) {
-			final ArticleRef a = adapter.getItem(idx);
-			tts.speak(a.text, TextToSpeech.QUEUE_FLUSH, null);
 		}
 	}
 
@@ -274,5 +289,19 @@ public class ArticleListActivity extends ListActivity implements OnInitListener 
 		} else {
 			Log.e(TAG, "Initilization Failed");
 		}
+	}
+	
+	@Override
+	public void onMediaPlay() {
+	}
+
+	@Override
+	public void onMediaNext() {
+		next();
+	}
+
+	@Override
+	public void onMediaPrev() {
+		prev();
 	}
 }

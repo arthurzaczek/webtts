@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import net.zaczek.webtts.Data.ArticleRef;
 import net.zaczek.webtts.Data.DataManager;
+import net.zaczek.webtts.mpr.MediaPlayerReceiver;
+import net.zaczek.webtts.mpr.RemoteControlListener;
 
 import org.jsoup.Connection.Response;
 import org.jsoup.nodes.Document;
@@ -12,10 +14,8 @@ import org.jsoup.select.Elements;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -26,7 +26,6 @@ import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +33,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ArticleActivity extends Activity implements OnInitListener {
+public class ArticleActivity extends Activity implements OnInitListener, RemoteControlListener {
 	private static final String TAG = "webtts";
 
 	private static final int ABOUT_ID = 1;
@@ -44,6 +43,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 	private TextView txtArticle;
 	private ProgressBar progBar;
 	private WakeLock wl;
+	private MediaPlayerReceiver mediaPlayerReceiver = new MediaPlayerReceiver(this);
 
 	private TextToSpeech tts;
 	private HashMap<String, String> ttsParams = new HashMap<String, String>();
@@ -56,8 +56,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 
 	// private ArrayList<ArticleRef> moreArticles;
 	private ArticleRef article;
-
-	private MPR mediaPlayerReceiver = new MPR();
 
 	/** Called when the activity is first created. */
 	@SuppressWarnings("deprecation")
@@ -88,6 +86,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 				}
 			}
 		});
+		mediaPlayerReceiver.registerReceiver(this);
 
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
 		progBar = (ProgressBar) findViewById(R.id.progBar);
@@ -95,10 +94,6 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
 		fillData();
-
-		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-		mediaFilter.setPriority(9999);
-		this.registerReceiver(mediaPlayerReceiver, mediaFilter);
 	}
 
 	@Override
@@ -122,7 +117,7 @@ public class ArticleActivity extends Activity implements OnInitListener {
 			tts.shutdown();
 		}
 
-		this.unregisterReceiver(mediaPlayerReceiver);
+		mediaPlayerReceiver.unregisterReceiver(this);
 	}
 
 	private void play() {
@@ -331,53 +326,22 @@ public class ArticleActivity extends Activity implements OnInitListener {
 		prev();
 	}
 
-	// http://stackoverflow.com/questions/5584605/is-it-possible-to-react-to-headphone-volume-up-down-keys-in-an-android-applicati
-	// http://developer.android.com/training/managing-audio/volume-playback.html
-	class MPR extends BroadcastReceiver {
-		public MPR() {
-			super();
+	@Override
+	public void onMediaPlay() {
+		if (isPlaying) {
+			stop();
+		} else {
+			play();
 		}
+	}
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Log.d(TAG, "MPR called");
-			final String intentAction = intent.getAction();
-			if (!Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
-				Log.d(TAG, "Not ACTION_MEDIA_BUTTON, intent was "
-						+ intentAction);
-				return;
-			}
-			final KeyEvent event = (KeyEvent) intent
-					.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-			if (event == null) {
-				Log.d(TAG, "No event");
-				return;
-			}
-			try {
-				final int action = event.getAction();
-				final int keyCode = event.getKeyCode();
-				Log.d(TAG, "Event.action = " + action + "; key = " + keyCode);
-				if (action == KeyEvent.ACTION_DOWN) {
-					switch (keyCode) {
-					case KeyEvent.KEYCODE_MEDIA_PLAY:
-						if (isPlaying) {
-							stop();
-						} else {
-							play();
-						}
-						break;
-					case KeyEvent.KEYCODE_MEDIA_NEXT:
-						next();
-						break;
-					case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-						prev();
-						break;
-					}
-				}
-			} catch (Exception e) {
-				Log.e(TAG, "Error in BroadcastReceiver", e);
-			}
-			abortBroadcast();
-		}
+	@Override
+	public void onMediaNext() {
+		next();
+	}
+
+	@Override
+	public void onMediaPrev() {
+		prev();
 	}
 }
