@@ -33,7 +33,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ArticleActivity extends Activity implements OnInitListener, RemoteControlListener {
+public class ArticleActivity extends Activity implements OnInitListener,
+		RemoteControlListener {
 	private static final String TAG = "webtts";
 
 	private static final int ABOUT_ID = 1;
@@ -43,7 +44,8 @@ public class ArticleActivity extends Activity implements OnInitListener, RemoteC
 	private TextView txtArticle;
 	private ProgressBar progBar;
 	private WakeLock wl;
-	private MediaPlayerReceiver mediaPlayerReceiver = new MediaPlayerReceiver(this);
+	private MediaPlayerReceiver mediaPlayerReceiver = new MediaPlayerReceiver(
+			this);
 
 	private TextToSpeech tts;
 	private HashMap<String, String> ttsParams = new HashMap<String, String>();
@@ -86,7 +88,7 @@ public class ArticleActivity extends Activity implements OnInitListener, RemoteC
 				}
 			}
 		});
-		
+
 		// Register/Unregister MPR here to enable navigation in background
 		mediaPlayerReceiver.registerReceiver(this);
 
@@ -95,6 +97,15 @@ public class ArticleActivity extends Activity implements OnInitListener, RemoteC
 
 		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
+		if (article == null) {
+			final String dataStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+			if (!TextUtils.isEmpty(dataStr)) {
+				article = new ArticleRef();
+				article.index = -1;
+				article.url = dataStr;
+				article.text = dataStr;
+			}
+		}
 		fillData();
 	}
 
@@ -166,6 +177,12 @@ public class ArticleActivity extends Activity implements OnInitListener, RemoteC
 	}
 
 	private void fillData() {
+		if (article == null) {
+			Log.e(TAG, "Nothing to read receivced");
+			Toast.makeText(this, "Nothing to read receivced", Toast.LENGTH_LONG)
+					.show();
+			finish();
+		}
 		super.setTitle(article.text);
 		progBar.setProgress(0);
 		progBar.setMax(0);

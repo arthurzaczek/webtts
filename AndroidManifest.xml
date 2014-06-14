@@ -40,7 +40,13 @@
         </activity>
         <activity
             android:name="net.zaczek.webtts.ArticleActivity"
-            android:label="Article" >
+            android:label="Read article" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
