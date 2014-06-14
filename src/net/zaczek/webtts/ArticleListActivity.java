@@ -60,12 +60,23 @@ public class ArticleListActivity extends ListActivity implements
 		}
 
 		tts = new TextToSpeech(this, this);
-		mediaPlayerReceiver.registerReceiver(this);
 
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		mediaPlayerReceiver.registerReceiver(this);
+	}
+	
+	@Override
+	protected void onPause() {
+		mediaPlayerReceiver.unregisterReceiver(this);
+		super.onPause();
+	}
+	
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -74,7 +85,6 @@ public class ArticleListActivity extends ListActivity implements
 			tts.stop();
 			tts.shutdown();
 		}
-		mediaPlayerReceiver.unregisterReceiver(this);
 	}
 	
 	private void select(int idx) {

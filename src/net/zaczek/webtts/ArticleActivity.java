@@ -86,6 +86,8 @@ public class ArticleActivity extends Activity implements OnInitListener, RemoteC
 				}
 			}
 		});
+		
+		// Register/Unregister MPR here to enable navigation in background
 		mediaPlayerReceiver.registerReceiver(this);
 
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
@@ -117,6 +119,7 @@ public class ArticleActivity extends Activity implements OnInitListener, RemoteC
 			tts.shutdown();
 		}
 
+		// Register/Unregister MPR here to enable navigation in background
 		mediaPlayerReceiver.unregisterReceiver(this);
 	}
 

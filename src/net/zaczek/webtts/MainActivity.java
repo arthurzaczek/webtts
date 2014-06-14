@@ -41,10 +41,21 @@ public class MainActivity extends ListActivity implements OnInitListener,
 		tts = new TextToSpeech(this, this);
 
 		registerForContextMenu(getListView());
-		mediaPlayerReceiver.registerReceiver(this);
 
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		mediaPlayerReceiver.registerReceiver(this);
+	}
+	
+	@Override
+	protected void onPause() {
+		mediaPlayerReceiver.unregisterReceiver(this);
+		super.onPause();
 	}
 
 	@Override
@@ -55,7 +66,6 @@ public class MainActivity extends ListActivity implements OnInitListener,
 			tts.stop();
 			tts.shutdown();
 		}
-		mediaPlayerReceiver.unregisterReceiver(this);
 	}
 
 	@Override

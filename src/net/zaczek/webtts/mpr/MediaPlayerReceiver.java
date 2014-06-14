@@ -3,9 +3,11 @@ package net.zaczek.webtts.mpr;
 import java.security.InvalidParameterException;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -14,6 +16,8 @@ import android.view.KeyEvent;
 public class MediaPlayerReceiver extends BroadcastReceiver {
 	private static final String TAG = "mpr";
 	private final RemoteControlListener listener;
+	private ComponentName mediaButtonReceiver;
+	private AudioManager mAudioManager;
 
 	public MediaPlayerReceiver(RemoteControlListener listener) {
 		super();
@@ -23,12 +27,20 @@ public class MediaPlayerReceiver extends BroadcastReceiver {
 	}
 	
 	public void registerReceiver(Context ctx) {
+		Log.i(TAG, "registerReceiver");
+		mediaButtonReceiver = new ComponentName(ctx.getPackageName(), MediaPlayerReceiver.class.getName());
+		mAudioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
+
+		mAudioManager.registerMediaButtonEventReceiver(mediaButtonReceiver);
+
 		IntentFilter mediaFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-		mediaFilter.setPriority(9999);
+		mediaFilter.setPriority(999);
 		ctx.registerReceiver(this, mediaFilter);
 	}
 	
 	public void unregisterReceiver(Context ctx) {
+		Log.i(TAG, "unregisterReceiver");
+		mAudioManager.unregisterMediaButtonEventReceiver(mediaButtonReceiver);
 		ctx.unregisterReceiver(this);
 	}
 
