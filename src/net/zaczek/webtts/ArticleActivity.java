@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,10 @@ public class ArticleActivity extends Activity implements OnInitListener,
 
 	private TextView txtArticle;
 	private ProgressBar progBar;
+	private ImageButton btnNext;
+	private ImageButton btnPrev;
+	private ImageButton btnPlayPause;
+
 	private WakeLock wl;
 	private MediaPlayerReceiver mediaPlayerReceiver = new MediaPlayerReceiver(
 			this);
@@ -94,6 +99,9 @@ public class ArticleActivity extends Activity implements OnInitListener,
 
 		txtArticle = (TextView) findViewById(R.id.txtArticle);
 		progBar = (ProgressBar) findViewById(R.id.progBar);
+		btnNext = (ImageButton) findViewById(R.id.btnNext);
+		btnPrev = (ImageButton) findViewById(R.id.btnPrev);
+		btnPlayPause = (ImageButton)findViewById(R.id.btnPlayPause);
 
 		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
@@ -141,11 +149,13 @@ public class ArticleActivity extends Activity implements OnInitListener,
 			currentSentenceIdx++;
 			tts.speak(sentences[localIdx], TextToSpeech.QUEUE_FLUSH, ttsParams);
 			isPlaying = true;
+			btnPlayPause.setImageResource(android.R.drawable.ic_media_pause);
 		}
 	}
 
 	private void stop() {
 		isPlaying = false;
+		btnPlayPause.setImageResource(android.R.drawable.ic_media_play);
 		tts.stop();
 	}
 
@@ -192,6 +202,14 @@ public class ArticleActivity extends Activity implements OnInitListener,
 		super.setTitle(article.text);
 		progBar.setProgress(0);
 		progBar.setMax(0);
+
+		if (article.index < 0) {
+			btnNext.setEnabled(false);
+			btnPrev.setEnabled(false);
+		} else {
+			btnNext.setEnabled(true);
+			btnPrev.setEnabled(true);
+		}
 
 		if (task == null) {
 			task = new FillDataTask();
