@@ -150,6 +150,9 @@ public class ArticleActivity extends Activity implements OnInitListener,
 	}
 
 	private void prev() {
+		if (article == null || article.index < 0)
+			return;
+
 		if (article.index > 0) {
 			stop();
 			article = DataManager.getCurrentArticles().get(article.index - 1);
@@ -158,6 +161,9 @@ public class ArticleActivity extends Activity implements OnInitListener,
 	}
 
 	private void next() {
+		if (article == null || article.index < 0)
+			return;
+
 		if (article.index < DataManager.getCurrentArticles().size()) {
 			stop();
 			article = DataManager.getCurrentArticles().get(article.index + 1);
