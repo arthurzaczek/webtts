@@ -25,6 +25,8 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.speech.tts.TextToSpeech.OnUtteranceCompletedListener;
 import android.support.v4.app.NavUtils;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -52,6 +54,9 @@ public class ArticleActivity extends Activity implements OnInitListener,
 	private WakeLock wl;
 	private MediaPlayerReceiver mediaPlayerReceiver = new MediaPlayerReceiver(
 			this);
+	private TelephonyManager phoneMgr;
+	private PhoneStateListener phoneStateListener;
+	private boolean activeCall = false;
 
 	private TextToSpeech tts;
 	private HashMap<String, String> ttsParams = new HashMap<String, String>();
@@ -111,6 +116,29 @@ public class ArticleActivity extends Activity implements OnInitListener,
 		}
 		updateView();
 		fillData();
+
+		phoneMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+		if (phoneMgr != null) {
+			phoneStateListener = new PhoneStateListener() {
+				
+				@Override
+				public void onCallStateChanged(int state, String incomingNumber) {
+					if (state == TelephonyManager.CALL_STATE_RINGING) {
+						activeCall = true;
+						stop();
+					} else if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
+						activeCall = true;
+						stop();
+					} else if (state == TelephonyManager.CALL_STATE_IDLE) {
+						activeCall = false;
+						play();
+					}
+					super.onCallStateChanged(state, incomingNumber);
+				}
+			};
+			phoneMgr.listen(phoneStateListener,
+					PhoneStateListener.LISTEN_CALL_STATE);
+		}
 	}
 
 	@Override
@@ -136,6 +164,10 @@ public class ArticleActivity extends Activity implements OnInitListener,
 
 		// Register/Unregister MPR here to enable navigation in background
 		mediaPlayerReceiver.unregisterReceiver(this);
+
+		if (phoneMgr != null) {
+			phoneMgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+		}
 	}
 
 	@Override
@@ -147,9 +179,9 @@ public class ArticleActivity extends Activity implements OnInitListener,
 		updateView();
 	}
 
-	private void play() {
+	private void play() {		
 		if (sentences != null && sentences.length > 0 && ttsInitialized
-				&& !isPlaying) {
+				&& !isPlaying && !activeCall) {
 			final int localIdx = currentSentenceIdx;
 			currentSentenceIdx++;
 			tts.speak(sentences[localIdx], TextToSpeech.QUEUE_FLUSH, ttsParams);
