@@ -40,7 +40,8 @@
         </activity>
         <activity
             android:name="net.zaczek.webtts.ArticleActivity"
-            android:label="Read article" >
+            android:label="Read article"
+            android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 

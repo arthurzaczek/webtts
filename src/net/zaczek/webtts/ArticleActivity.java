@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -97,12 +98,6 @@ public class ArticleActivity extends Activity implements OnInitListener,
 		// Register/Unregister MPR here to enable navigation in background
 		mediaPlayerReceiver.registerReceiver(this);
 
-		txtArticle = (TextView) findViewById(R.id.txtArticle);
-		progBar = (ProgressBar) findViewById(R.id.progBar);
-		btnNext = (ImageButton) findViewById(R.id.btnNext);
-		btnPrev = (ImageButton) findViewById(R.id.btnPrev);
-		btnPlayPause = (ImageButton)findViewById(R.id.btnPlayPause);
-
 		final Intent intent = getIntent();
 		article = intent.getParcelableExtra("article");
 		if (article == null) {
@@ -114,6 +109,7 @@ public class ArticleActivity extends Activity implements OnInitListener,
 				article.text = dataStr;
 			}
 		}
+		updateView();
 		fillData();
 	}
 
@@ -140,6 +136,15 @@ public class ArticleActivity extends Activity implements OnInitListener,
 
 		// Register/Unregister MPR here to enable navigation in background
 		mediaPlayerReceiver.unregisterReceiver(this);
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		// re-apply content view on orientation changes
+		// http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
+		setContentView(R.layout.article);
+		updateView();
 	}
 
 	private void play() {
@@ -192,6 +197,32 @@ public class ArticleActivity extends Activity implements OnInitListener,
 		}
 	}
 
+	private void updateView() {
+		txtArticle = (TextView) findViewById(R.id.txtArticle);
+		progBar = (ProgressBar) findViewById(R.id.progBar);
+		btnNext = (ImageButton) findViewById(R.id.btnNext);
+		btnPrev = (ImageButton) findViewById(R.id.btnPrev);
+		btnPlayPause = (ImageButton) findViewById(R.id.btnPlayPause);
+
+		if (article == null)
+			return;
+
+		if (sentences != null && text != null && currentSentenceIdx >= 0) {
+			txtArticle.setText(String.format("%d chars, %d sentences",
+					text.length(), sentences.length));
+			progBar.setProgress(currentSentenceIdx);
+			progBar.setMax(sentences.length);
+		}
+
+		if (article.index < 0) {
+			btnNext.setEnabled(false);
+			btnPrev.setEnabled(false);
+		} else {
+			btnNext.setEnabled(true);
+			btnPrev.setEnabled(true);
+		}
+	}
+
 	private void fillData() {
 		if (article == null) {
 			Log.e(TAG, "Nothing to read receivced");
@@ -203,13 +234,9 @@ public class ArticleActivity extends Activity implements OnInitListener,
 		progBar.setProgress(0);
 		progBar.setMax(0);
 
-		if (article.index < 0) {
-			btnNext.setEnabled(false);
-			btnPrev.setEnabled(false);
-		} else {
-			btnNext.setEnabled(true);
-			btnPrev.setEnabled(true);
-		}
+		btnNext.setEnabled(false);
+		btnPrev.setEnabled(false);
+		btnPlayPause.setEnabled(false);
 
 		if (task == null) {
 			task = new FillDataTask();
@@ -311,12 +338,10 @@ public class ArticleActivity extends Activity implements OnInitListener,
 				txtArticle.setText(msg);
 			} else {
 				sentences = text.toString().split("(?<=[a-z])\\.\\s+");
-				txtArticle.setText(String.format("%d chars, %d sentences",
-						text.length(), sentences.length));
-				progBar.setProgress(0);
-				progBar.setMax(sentences.length);
 				currentSentenceIdx = 0;
+				updateView();
 				play();
+				btnPlayPause.setEnabled(true);
 			}
 			task = null;
 			super.onPostExecute(result);
