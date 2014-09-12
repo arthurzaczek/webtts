@@ -61,6 +61,10 @@ public class ArticleListActivity extends ListActivity implements
 
 		tts = new TextToSpeech(this, this);
 
+		adapter = new ArrayAdapter<ArticleRef>(ArticleListActivity.this,
+				android.R.layout.simple_list_item_activated_1,
+				new ArticleRef[] {});
+
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		fillData();
 	}
@@ -70,13 +74,13 @@ public class ArticleListActivity extends ListActivity implements
 		super.onResume();
 		mediaPlayerReceiver.registerReceiver(this);
 	}
-	
+
 	@Override
 	protected void onPause() {
 		mediaPlayerReceiver.unregisterReceiver(this);
 		super.onPause();
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -86,9 +90,9 @@ public class ArticleListActivity extends ListActivity implements
 			tts.shutdown();
 		}
 	}
-	
+
 	private void select(int idx) {
-		if (idx >= getListAdapter().getCount())
+		if (idx >= adapter.getCount())
 			return;
 		setSelection(idx);
 		getListView().setItemChecked(idx, true);
@@ -99,10 +103,10 @@ public class ArticleListActivity extends ListActivity implements
 	}
 
 	private void next() {
-		if (getListAdapter().getCount() == 0)
+		if (adapter.getCount() == 0)
 			return;
 		final int idx = getListView().getCheckedItemPosition();
-		if (idx + 1 < getListAdapter().getCount()) {
+		if (idx + 1 < adapter.getCount()) {
 			select(idx + 1);
 		} else {
 			select(0);
@@ -110,7 +114,7 @@ public class ArticleListActivity extends ListActivity implements
 	}
 
 	private void prev() {
-		final int count = getListAdapter().getCount();
+		final int count = adapter.getCount();
 		if (count == 0)
 			return;
 		final int idx = getListView().getCheckedItemPosition();
@@ -139,7 +143,7 @@ public class ArticleListActivity extends ListActivity implements
 	}
 
 	private void play(int position) {
-		if (position < 0 || position >= getListAdapter().getCount())
+		if (position < 0 || position >= adapter.getCount())
 			return;
 
 		final ArticleRef a = adapter.getItem(position);
@@ -300,7 +304,7 @@ public class ArticleListActivity extends ListActivity implements
 			Log.e(TAG, "Initilization Failed");
 		}
 	}
-	
+
 	@Override
 	public void onMediaPlay() {
 	}
